@@ -94,7 +94,11 @@ export function RecurringExpenseForm({
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione uma categoria" />
+                    <SelectValue placeholder="Selecione uma categoria">
+                      {(value: string | null) =>
+                        categories?.find((c) => c.id === value)?.name ?? "Selecione uma categoria"
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

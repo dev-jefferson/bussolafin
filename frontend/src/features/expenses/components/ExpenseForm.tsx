@@ -108,7 +108,11 @@ export function ExpenseForm({
               >
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecione uma categoria" />
+                    <SelectValue placeholder="Selecione uma categoria">
+                      {(value: string | null) =>
+                        categories?.find((c) => c.id === value)?.name ?? "Selecione uma categoria"
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
