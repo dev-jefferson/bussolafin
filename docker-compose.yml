@@ -1,8 +1,10 @@
+name: bussolafin
+
 services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: controle_financeiro
+      POSTGRES_DB: bussolafin
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
@@ -10,7 +12,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d controle_financeiro"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d bussolafin"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -39,7 +41,7 @@ services:
     build: ./frontend
     environment:
       BACKEND_INTERNAL_URL: http://backend:8080
-      JWT_COOKIE_NAME: cf_session
+      JWT_COOKIE_NAME: bf_session
       NODE_ENV: production
     depends_on:
       backend:

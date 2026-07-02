@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/controle_financeiro
+    url: jdbc:postgresql://postgres:5432/bussolafin
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 

@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>com.controlefinanceiro</groupId>
-    <artifactId>api</artifactId>
+    <artifactId>bussolafin-api</artifactId>
     <version>0.1.0</version>
-    <name>controle-financeiro-api</name>
-    <description>Controle Financeiro - backend API</description>
+    <name>bussolafin-api</name>
+    <description>BussolaFin - backend API</description>
 
     <properties>
         <java.version>21</java.version>

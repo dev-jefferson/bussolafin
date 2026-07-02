@@ -1,4 +1,4 @@
-export const SESSION_COOKIE_NAME = process.env.JWT_COOKIE_NAME ?? "cf_session";
+export const SESSION_COOKIE_NAME = process.env.JWT_COOKIE_NAME ?? "bf_session";
 
 export function getBackendUrl(): string {
   return process.env.BACKEND_INTERNAL_URL ?? "http://localhost:8080";

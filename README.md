@@ -1,4 +1,4 @@
-# Controle Financeiro
+# BússolaFin
 
 Sistema de controle financeiro mensal (receitas, despesas por categoria e simulação de "gasto ajustado"), substituindo uma planilha Excel.
 

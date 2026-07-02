@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Controle Financeiro",
-  description: "Controle financeiro mensal - receitas, despesas e simulação de gastos",
+  title: "BússolaFin",
+  description: "BússolaFin - controle financeiro mensal, receitas, despesas e simulação de gastos",
 };
 
 export default function RootLayout({
