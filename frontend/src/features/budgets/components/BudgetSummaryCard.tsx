@@ -10,10 +10,12 @@ import { useBudgetSummary } from "../hooks";
 function StatCard({
   label,
   value,
+  secondaryValue,
   highlight,
 }: {
   label: string;
   value: number;
+  secondaryValue?: number;
   highlight?: boolean;
 }) {
   return (
@@ -23,6 +25,11 @@ function StatCard({
       </CardHeader>
       <CardContent>
         <p className="text-2xl font-semibold">{formatCurrency(value)}</p>
+        {secondaryValue != null && (
+          <p className="mt-1 text-sm text-muted-foreground">
+            simulado: {formatCurrency(secondaryValue)}
+          </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -49,8 +56,16 @@ export function BudgetSummaryCard({ budgetId }: { budgetId: string }) {
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Renda total" value={summary.totalIncome} />
-        <StatCard label="Gastos" value={summary.totalExpenses} />
-        <StatCard label="Ajustes (gastos ajustáveis)" value={summary.totalAdjustable} />
+        <StatCard
+          label="Gastos"
+          value={summary.totalExpenses}
+          secondaryValue={simulated ? summary.totalExpensesSimulated : undefined}
+        />
+        <StatCard
+          label="Ajustes (gastos ajustáveis)"
+          value={summary.totalAdjustable}
+          secondaryValue={simulated ? summary.totalAdjustableSimulated : undefined}
+        />
         <StatCard
           label={simulated ? "Economia (simulada)" : "Economia"}
           value={economia}
