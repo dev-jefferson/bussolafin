@@ -14,13 +14,14 @@ export function CreateNextBudgetButton() {
 
   function handleClick() {
     createNextBudget.mutate(undefined, {
-      onSuccess: ({ budget, generation }) => {
+      onSuccess: ({ budget, generation, incomesCopied }) => {
         const label = formatMonthYear(budget.month, budget.year);
         const parts = [];
-        if (generation.expensesAdded > 0) parts.push(`${generation.expensesAdded} despesa(s)`);
-        if (generation.incomesAdded > 0) parts.push(`${generation.incomesAdded} receita(s)`);
-        const recurringNote = parts.length > 0 ? ` (${parts.join(" e ")} recorrentes adicionadas)` : "";
-        toast.success(`${label} criado${recurringNote}`);
+        if (generation.expensesAdded > 0) parts.push(`${generation.expensesAdded} despesa(s) recorrente(s)`);
+        if (generation.incomesAdded > 0) parts.push(`${generation.incomesAdded} receita(s) recorrente(s)`);
+        if (incomesCopied > 0) parts.push(`${incomesCopied} receita(s) copiada(s) do mês anterior`);
+        const note = parts.length > 0 ? ` (${parts.join(", ")})` : "";
+        toast.success(`${label} criado${note}`);
         router.push(`/budgets/${budget.id}`);
       },
       onError: (error) => {
