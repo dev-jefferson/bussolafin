@@ -105,7 +105,9 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
                 <TableCell className="text-muted-foreground">{expense.category.name}</TableCell>
                 <TableCell className="text-right">{formatCurrency(expense.value)}</TableCell>
                 <TableCell className="text-right text-muted-foreground">
-                  {expense.simulatedValue != null ? formatCurrency(expense.simulatedValue) : "-"}
+                  {expense.category.adjustable && expense.simulatedValue != null
+                    ? formatCurrency(expense.simulatedValue)
+                    : "-"}
                 </TableCell>
                 <TableCell className="flex justify-end gap-1">
                   {!expense.recurring && (

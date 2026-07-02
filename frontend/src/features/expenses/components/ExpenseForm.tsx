@@ -51,10 +51,15 @@ export function ExpenseForm({
     },
   });
 
+  const selectedCategoryId = form.watch("categoryId");
+  const selectedCategory = categories?.find((category) => category.id === selectedCategoryId);
+  const isAdjustable = selectedCategory?.adjustable ?? false;
+
   function onSubmit(values: ExpenseInput) {
+    const payload = isAdjustable ? values : { ...values, simulatedValue: null };
     const mutation = isEditing
-      ? updateExpense.mutateAsync({ id: expense!.id, input: values })
-      : createExpense.mutateAsync(values);
+      ? updateExpense.mutateAsync({ id: expense!.id, input: payload })
+      : createExpense.mutateAsync(payload);
 
     mutation
       .then(() => {
@@ -91,7 +96,16 @@ export function ExpenseForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Categoria</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  const category = categories?.find((c) => c.id === value);
+                  if (!category?.adjustable) {
+                    form.setValue("simulatedValue", null);
+                  }
+                }}
+                value={field.value}
+              >
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione uma categoria" />
@@ -109,7 +123,7 @@ export function ExpenseForm({
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className={isAdjustable ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-4"}>
           <FormField
             control={form.control}
             name="value"
@@ -129,27 +143,29 @@ export function ExpenseForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="simulatedValue"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Valor ajustado (opcional)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min={0}
-                    value={field.value ?? ""}
-                    onChange={(e) =>
-                      field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {isAdjustable && (
+            <FormField
+              control={form.control}
+              name="simulatedValue"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Valor ajustado (opcional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min={0}
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
         <Button type="submit" disabled={isPending}>
           {isEditing ? "Salvar alterações" : "Adicionar despesa"}

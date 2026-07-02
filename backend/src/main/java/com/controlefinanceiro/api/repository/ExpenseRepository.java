@@ -17,7 +17,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
     @Query("""
         SELECT
           COALESCE(SUM(e.value), 0) as totalExpenses,
-          COALESCE(SUM(COALESCE(e.simulatedValue, e.value)), 0) as totalExpensesSimulated,
+          COALESCE(SUM(CASE WHEN e.category.adjustable = true THEN COALESCE(e.simulatedValue, e.value) ELSE e.value END), 0) as totalExpensesSimulated,
           COALESCE(SUM(CASE WHEN e.category.adjustable = true THEN e.value ELSE 0 END), 0) as totalAdjustable,
           COALESCE(SUM(CASE WHEN e.category.adjustable = true THEN COALESCE(e.simulatedValue, e.value) ELSE 0 END), 0) as totalAdjustableSimulated
         FROM Expense e
@@ -31,7 +31,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID> {
           c.name as categoryName,
           c.adjustable as adjustable,
           COALESCE(SUM(e.value), 0) as total,
-          COALESCE(SUM(COALESCE(e.simulatedValue, e.value)), 0) as totalSimulated
+          COALESCE(SUM(CASE WHEN c.adjustable = true THEN COALESCE(e.simulatedValue, e.value) ELSE e.value END), 0) as totalSimulated
         FROM Expense e
         JOIN e.category c
         WHERE e.budget.id = :budgetId

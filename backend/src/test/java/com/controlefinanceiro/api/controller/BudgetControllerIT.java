@@ -118,6 +118,56 @@ class BudgetControllerIT extends AbstractIntegrationTest {
                 .andExpect(status().isConflict());
     }
 
+    @Test
+    void simulatedValueOnFixedCategoryExpenseIsIgnoredInTotals() throws Exception {
+        String token = registerAndGetToken("fixed-sim@example.com");
+
+        String aguaCategoryId = createCategory(token, "AGUA", false);
+        String comidaCategoryId = createCategory(token, "COMIDA", true);
+
+        MvcResult budgetResult = mockMvc.perform(post("/api/v1/budgets")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"month":10,"year":2026,"previousBalance":0}
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String budgetId = objectMapper.readTree(budgetResult.getResponse().getContentAsString())
+                .get("id").asText();
+
+        // Fixed category: even with a simulatedValue set (by mistake or via the API directly),
+        // it must NOT count toward the simulated totals.
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"description":"Conta de agua","categoryId":"%s","value":100.00,"simulatedValue":50.00}
+                                """.formatted(aguaCategoryId)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"description":"Supermercado","categoryId":"%s","value":200.00,"simulatedValue":80.00}
+                                """.formatted(comidaCategoryId)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/v1/budgets/" + budgetId + "/summary")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalExpenses").value(300.00))
+                .andExpect(jsonPath("$.totalExpensesSimulated").value(180.00))
+                .andExpect(jsonPath("$.totalAdjustable").value(200.00))
+                .andExpect(jsonPath("$.totalAdjustableSimulated").value(80.00));
+
+        mockMvc.perform(get("/api/v1/budgets/" + budgetId + "/expenses/by-category")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(jsonPath("$[?(@.categoryName == 'AGUA')].totalSimulated").value(100.00))
+                .andExpect(jsonPath("$[?(@.categoryName == 'COMIDA')].totalSimulated").value(80.00));
+    }
+
     private String createCategory(String token, String name, boolean adjustable) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/categories")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
