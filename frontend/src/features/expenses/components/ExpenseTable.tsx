@@ -3,7 +3,6 @@
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -83,12 +82,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
             {expenses.map((expense) => (
               <TableRow key={expense.id}>
                 <TableCell className="font-medium">{expense.description}</TableCell>
-                <TableCell>
-                  <span className="flex items-center gap-2 text-muted-foreground">
-                    {expense.category.name}
-                    {expense.category.adjustable && <Badge variant="secondary">Ajustável</Badge>}
-                  </span>
-                </TableCell>
+                <TableCell className="text-muted-foreground">{expense.category.name}</TableCell>
                 <TableCell className="text-right">{formatCurrency(expense.value)}</TableCell>
                 <TableCell className="text-right text-muted-foreground">
                   {expense.simulatedValue != null ? formatCurrency(expense.simulatedValue) : "-"}
