@@ -7,9 +7,17 @@ import { Switch } from "@/components/ui/switch";
 import { formatCurrency } from "@/lib/format";
 import { useBudgetSummary } from "../hooks";
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value: number;
+  highlight?: boolean;
+}) {
   return (
-    <Card>
+    <Card className={highlight ? "border-primary/40" : undefined}>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-normal text-muted-foreground">{label}</CardTitle>
       </CardHeader>
@@ -28,8 +36,6 @@ export function BudgetSummaryCard({ budgetId }: { budgetId: string }) {
     return <p className="text-sm text-muted-foreground">Carregando resumo...</p>;
   }
 
-  const totalExpenses = simulated ? summary.totalExpensesSimulated : summary.totalExpenses;
-  const totalAdjustable = simulated ? summary.totalAdjustableSimulated : summary.totalAdjustable;
   const economia = simulated ? summary.economiaSimulada : summary.economia;
 
   return (
@@ -37,12 +43,19 @@ export function BudgetSummaryCard({ budgetId }: { budgetId: string }) {
       <div className="flex items-center gap-2">
         <Switch id="simulate" checked={simulated} onCheckedChange={setSimulated} />
         <Label htmlFor="simulate">Simular gasto ajustado</Label>
+        <span className="text-sm text-muted-foreground">
+          — e se eu fizesse os ajustes que estou considerando?
+        </span>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Renda total" value={summary.totalIncome} />
-        <StatCard label="Gastos" value={totalExpenses} />
-        <StatCard label="Ajustes (gastos ajustáveis)" value={totalAdjustable} />
-        <StatCard label="Economia" value={economia} />
+        <StatCard label="Gastos" value={summary.totalExpenses} />
+        <StatCard label="Ajustes (gastos ajustáveis)" value={summary.totalAdjustable} />
+        <StatCard
+          label={simulated ? "Economia (simulada)" : "Economia"}
+          value={economia}
+          highlight={simulated}
+        />
       </div>
     </div>
   );
