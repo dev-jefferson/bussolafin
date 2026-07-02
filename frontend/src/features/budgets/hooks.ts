@@ -47,6 +47,14 @@ export function useDeleteBudget() {
   });
 }
 
+export function useCreateNextBudget() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: budgetsApi.createNextBudget,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: BUDGETS_KEY }),
+  });
+}
+
 export function invalidateBudgetSummary(
   queryClient: ReturnType<typeof useQueryClient>,
   budgetId: string

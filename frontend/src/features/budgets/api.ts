@@ -1,9 +1,13 @@
 import { apiClient } from "@/lib/api-client";
-import type { Budget, BudgetSummary } from "@/types/api";
+import type { Budget, BudgetSummary, NextBudgetResult } from "@/types/api";
 import type { BudgetInput } from "./schemas";
 
 export function listBudgets() {
   return apiClient.get<Budget[]>("/budgets");
+}
+
+export function createNextBudget() {
+  return apiClient.post<NextBudgetResult>("/budgets/next");
 }
 
 export function getBudget(id: string) {

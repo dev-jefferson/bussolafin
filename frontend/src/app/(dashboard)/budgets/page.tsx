@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { BudgetForm } from "@/features/budgets/components/BudgetForm";
 import { BudgetList } from "@/features/budgets/components/BudgetList";
+import { CreateNextBudgetButton } from "@/features/budgets/components/CreateNextBudgetButton";
 
 export default function BudgetsPage() {
   const [open, setOpen] = useState(false);
@@ -23,18 +24,21 @@ export default function BudgetsPage() {
           <h1 className="text-2xl font-semibold">Orçamentos</h1>
           <p className="text-sm text-muted-foreground">Seus meses de controle financeiro</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger render={<Button />}>
-            <Plus className="size-4" />
-            Novo orçamento
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Novo orçamento</DialogTitle>
-            </DialogHeader>
-            <BudgetForm onSuccess={() => setOpen(false)} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <CreateNextBudgetButton />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger render={<Button />}>
+              <Plus className="size-4" />
+              Novo orçamento
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Novo orçamento</DialogTitle>
+              </DialogHeader>
+              <BudgetForm onSuccess={() => setOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       <BudgetList />
     </div>

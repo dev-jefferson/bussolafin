@@ -56,6 +56,11 @@ export type GenerateRecurringResult = {
   incomesAdded: number;
 };
 
+export type NextBudgetResult = {
+  budget: Budget;
+  generation: GenerateRecurringResult;
+};
+
 export type BudgetSummary = {
   budgetId: string;
   month: number;
