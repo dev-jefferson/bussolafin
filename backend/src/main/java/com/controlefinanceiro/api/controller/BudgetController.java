@@ -2,9 +2,11 @@ package com.controlefinanceiro.api.controller;
 
 import com.controlefinanceiro.api.dto.budget.BudgetRequest;
 import com.controlefinanceiro.api.dto.budget.BudgetResponse;
+import com.controlefinanceiro.api.dto.recurring.GenerateRecurringResponse;
 import com.controlefinanceiro.api.dto.summary.BudgetSummaryResponse;
 import com.controlefinanceiro.api.security.CurrentUserProvider;
 import com.controlefinanceiro.api.service.BudgetService;
+import com.controlefinanceiro.api.service.RecurringGenerationService;
 import com.controlefinanceiro.api.service.SummaryService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -28,6 +30,7 @@ public class BudgetController {
 
     private final BudgetService budgetService;
     private final SummaryService summaryService;
+    private final RecurringGenerationService recurringGenerationService;
     private final CurrentUserProvider currentUserProvider;
 
     @GetMapping
@@ -60,5 +63,10 @@ public class BudgetController {
     @GetMapping("/{id}/summary")
     public ResponseEntity<BudgetSummaryResponse> summary(@PathVariable UUID id) {
         return ResponseEntity.ok(summaryService.getSummary(currentUserProvider.getUserId(), id));
+    }
+
+    @PostMapping("/{id}/generate-recurring")
+    public ResponseEntity<GenerateRecurringResponse> generateRecurring(@PathVariable UUID id) {
+        return ResponseEntity.ok(recurringGenerationService.generate(currentUserProvider.getUserId(), id));
     }
 }

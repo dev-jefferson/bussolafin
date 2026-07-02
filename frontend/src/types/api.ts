@@ -22,6 +22,7 @@ export type Income = {
   description: string;
   day: number | null;
   value: number;
+  recurring: boolean;
 };
 
 export type Expense = {
@@ -30,6 +31,29 @@ export type Expense = {
   category: Category;
   value: number;
   simulatedValue: number | null;
+  recurring: boolean;
+};
+
+export type RecurringExpense = {
+  id: string;
+  description: string;
+  category: Category;
+  value: number;
+  simulatedValue: number | null;
+  active: boolean;
+};
+
+export type RecurringIncome = {
+  id: string;
+  description: string;
+  day: number | null;
+  value: number;
+  active: boolean;
+};
+
+export type GenerateRecurringResult = {
+  expensesAdded: number;
+  incomesAdded: number;
 };
 
 export type BudgetSummary = {

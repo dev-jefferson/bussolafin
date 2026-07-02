@@ -4,6 +4,7 @@ import { LogoutButton } from "@/features/auth/components/LogoutButton";
 const NAV_LINKS = [
   { href: "/budgets", label: "Orçamentos" },
   { href: "/categories", label: "Categorias" },
+  { href: "/recurring", label: "Recorrências" },
   { href: "/comparison", label: "Comparativo" },
 ];
 

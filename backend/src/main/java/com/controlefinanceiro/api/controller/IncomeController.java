@@ -2,6 +2,7 @@ package com.controlefinanceiro.api.controller;
 
 import com.controlefinanceiro.api.dto.income.IncomeRequest;
 import com.controlefinanceiro.api.dto.income.IncomeResponse;
+import com.controlefinanceiro.api.dto.recurring.RecurringIncomeResponse;
 import com.controlefinanceiro.api.security.CurrentUserProvider;
 import com.controlefinanceiro.api.service.IncomeService;
 import jakarta.validation.Valid;
@@ -49,5 +50,13 @@ public class IncomeController {
     public ResponseEntity<Void> delete(@PathVariable UUID budgetId, @PathVariable UUID id) {
         incomeService.delete(currentUserProvider.getUserId(), budgetId, id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/promote-to-recurring")
+    public ResponseEntity<RecurringIncomeResponse> promoteToRecurring(
+            @PathVariable UUID budgetId, @PathVariable UUID id) {
+        RecurringIncomeResponse response =
+                incomeService.promoteToRecurring(currentUserProvider.getUserId(), budgetId, id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

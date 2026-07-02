@@ -2,6 +2,7 @@ package com.controlefinanceiro.api.controller;
 
 import com.controlefinanceiro.api.dto.expense.ExpenseRequest;
 import com.controlefinanceiro.api.dto.expense.ExpenseResponse;
+import com.controlefinanceiro.api.dto.recurring.RecurringExpenseResponse;
 import com.controlefinanceiro.api.dto.summary.CategoryBreakdownItem;
 import com.controlefinanceiro.api.security.CurrentUserProvider;
 import com.controlefinanceiro.api.service.ExpenseService;
@@ -57,5 +58,13 @@ public class ExpenseController {
     @GetMapping("/by-category")
     public ResponseEntity<List<CategoryBreakdownItem>> byCategory(@PathVariable UUID budgetId) {
         return ResponseEntity.ok(summaryService.getBreakdown(currentUserProvider.getUserId(), budgetId));
+    }
+
+    @PostMapping("/{id}/promote-to-recurring")
+    public ResponseEntity<RecurringExpenseResponse> promoteToRecurring(
+            @PathVariable UUID budgetId, @PathVariable UUID id) {
+        RecurringExpenseResponse response =
+                expenseService.promoteToRecurring(currentUserProvider.getUserId(), budgetId, id);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

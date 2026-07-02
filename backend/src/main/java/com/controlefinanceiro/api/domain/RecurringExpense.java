@@ -14,17 +14,17 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name = "expenses")
+@Table(name = "recurring_expenses")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Expense extends BaseEntity {
+public class RecurringExpense extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "budget_id", nullable = false)
-    private Budget budget;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
@@ -39,7 +39,6 @@ public class Expense extends BaseEntity {
     @Column(name = "simulated_value", precision = 12, scale = 2)
     private BigDecimal simulatedValue;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recurring_expense_id")
-    private RecurringExpense recurringExpense;
+    @Column(nullable = false)
+    private boolean active;
 }

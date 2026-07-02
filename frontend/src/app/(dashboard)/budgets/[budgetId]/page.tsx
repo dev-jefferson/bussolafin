@@ -7,6 +7,7 @@ import { useBudget } from "@/features/budgets/hooks";
 import { CategoryBreakdownChart } from "@/features/expenses/components/CategoryBreakdownChart";
 import { ExpenseTable } from "@/features/expenses/components/ExpenseTable";
 import { IncomeTable } from "@/features/incomes/components/IncomeTable";
+import { GenerateRecurringButton } from "@/features/recurring/components/GenerateRecurringButton";
 import { formatMonthYear } from "@/lib/format";
 
 export default function BudgetDetailPage({
@@ -19,11 +20,14 @@ export default function BudgetDetailPage({
 
   return (
     <div className="grid gap-6">
-      <div>
-        <h1 className="text-2xl font-semibold">
-          {budget ? formatMonthYear(budget.month, budget.year) : "Orçamento"}
-        </h1>
-        <p className="text-sm text-muted-foreground">Receitas, despesas e resumo do mês</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">
+            {budget ? formatMonthYear(budget.month, budget.year) : "Orçamento"}
+          </h1>
+          <p className="text-sm text-muted-foreground">Receitas, despesas e resumo do mês</p>
+        </div>
+        <GenerateRecurringButton budgetId={budgetId} />
       </div>
 
       <Tabs defaultValue="summary">

@@ -34,4 +34,8 @@ public class Income extends BaseEntity {
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal value;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recurring_income_id")
+    private RecurringIncome recurringIncome;
 }

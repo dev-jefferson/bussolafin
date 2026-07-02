@@ -2,13 +2,18 @@ package com.controlefinanceiro.api.service;
 
 import com.controlefinanceiro.api.domain.Expense;
 import com.controlefinanceiro.api.domain.ExpenseCategory;
+import com.controlefinanceiro.api.domain.RecurringExpense;
 import com.controlefinanceiro.api.dto.expense.ExpenseRequest;
 import com.controlefinanceiro.api.dto.expense.ExpenseResponse;
+import com.controlefinanceiro.api.dto.recurring.RecurringExpenseResponse;
 import com.controlefinanceiro.api.exception.ResourceNotFoundException;
 import com.controlefinanceiro.api.mapper.ExpenseMapper;
+import com.controlefinanceiro.api.mapper.RecurringExpenseMapper;
 import com.controlefinanceiro.api.repository.BudgetRepository;
 import com.controlefinanceiro.api.repository.ExpenseCategoryRepository;
 import com.controlefinanceiro.api.repository.ExpenseRepository;
+import com.controlefinanceiro.api.repository.RecurringExpenseRepository;
+import com.controlefinanceiro.api.repository.UserRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +28,11 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final BudgetRepository budgetRepository;
     private final ExpenseCategoryRepository categoryRepository;
+    private final RecurringExpenseRepository recurringExpenseRepository;
+    private final UserRepository userRepository;
     private final BudgetService budgetService;
     private final ExpenseMapper expenseMapper;
+    private final RecurringExpenseMapper recurringExpenseMapper;
 
     public List<ExpenseResponse> list(UUID userId, UUID budgetId) {
         budgetService.findOwned(userId, budgetId);
@@ -61,6 +69,22 @@ public class ExpenseService {
     @Transactional
     public void delete(UUID userId, UUID budgetId, UUID expenseId) {
         expenseRepository.delete(findOwned(userId, budgetId, expenseId));
+    }
+
+    @Transactional
+    public RecurringExpenseResponse promoteToRecurring(UUID userId, UUID budgetId, UUID expenseId) {
+        Expense expense = findOwned(userId, budgetId, expenseId);
+        RecurringExpense recurringExpense = RecurringExpense.builder()
+                .user(userRepository.getReferenceById(userId))
+                .category(expense.getCategory())
+                .description(expense.getDescription())
+                .value(expense.getValue())
+                .simulatedValue(expense.getSimulatedValue())
+                .active(true)
+                .build();
+        recurringExpenseRepository.save(recurringExpense);
+        expense.setRecurringExpense(recurringExpense);
+        return recurringExpenseMapper.toResponse(recurringExpense);
     }
 
     private Expense findOwned(UUID userId, UUID budgetId, UUID expenseId) {

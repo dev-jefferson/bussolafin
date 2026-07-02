@@ -1,6 +1,6 @@
 "use client";
 
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Repeat, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import { ApiRequestError } from "@/lib/api-client";
 import { formatCurrency } from "@/lib/format";
+import { usePromoteExpenseToRecurring } from "@/features/recurring/hooks";
 import type { Expense } from "@/types/api";
 import { useDeleteExpense, useExpenses } from "../hooks";
 import { ExpenseForm } from "./ExpenseForm";
@@ -29,6 +30,7 @@ import { ExpenseForm } from "./ExpenseForm";
 export function ExpenseTable({ budgetId }: { budgetId: string }) {
   const { data: expenses, isPending } = useExpenses(budgetId);
   const deleteExpense = useDeleteExpense(budgetId);
+  const promoteToRecurring = usePromoteExpenseToRecurring(budgetId);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [creating, setCreating] = useState(false);
 
@@ -39,6 +41,17 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
       onError: (error) => {
         const message =
           error instanceof ApiRequestError ? error.message : "Não foi possível excluir";
+        toast.error(message);
+      },
+    });
+  }
+
+  function handlePromote(expense: Expense) {
+    promoteToRecurring.mutate(expense.id, {
+      onSuccess: () => toast.success(`"${expense.description}" agora é recorrente`),
+      onError: (error) => {
+        const message =
+          error instanceof ApiRequestError ? error.message : "Não foi possível marcar como recorrente";
         toast.error(message);
       },
     });
@@ -75,19 +88,36 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
               <TableHead>Categoria</TableHead>
               <TableHead className="text-right">Valor</TableHead>
               <TableHead className="text-right">Ajustado</TableHead>
-              <TableHead className="w-24" />
+              <TableHead className="w-32" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {expenses.map((expense) => (
               <TableRow key={expense.id}>
-                <TableCell className="font-medium">{expense.description}</TableCell>
+                <TableCell className="font-medium">
+                  <span className="flex items-center gap-1.5">
+                    {expense.description}
+                    {expense.recurring && (
+                      <Repeat className="size-3.5 text-muted-foreground" aria-label="Recorrente" />
+                    )}
+                  </span>
+                </TableCell>
                 <TableCell className="text-muted-foreground">{expense.category.name}</TableCell>
                 <TableCell className="text-right">{formatCurrency(expense.value)}</TableCell>
                 <TableCell className="text-right text-muted-foreground">
                   {expense.simulatedValue != null ? formatCurrency(expense.simulatedValue) : "-"}
                 </TableCell>
                 <TableCell className="flex justify-end gap-1">
+                  {!expense.recurring && (
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      title="Marcar como recorrente"
+                      onClick={() => handlePromote(expense)}
+                    >
+                      <Repeat className="size-4" />
+                    </Button>
+                  )}
                   <Button variant="ghost" size="icon-sm" onClick={() => setEditing(expense)}>
                     <Pencil className="size-4" />
                   </Button>
