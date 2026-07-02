@@ -44,6 +44,7 @@ export function ExpenseForm({
   const form = useForm<ExpenseInput>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
+      description: expense?.description ?? "",
       categoryId: expense?.category.id ?? "",
       value: expense?.value ?? 0,
       simulatedValue: expense?.simulatedValue ?? null,
@@ -71,6 +72,19 @@ export function ExpenseForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: Gasolina" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="categoryId"

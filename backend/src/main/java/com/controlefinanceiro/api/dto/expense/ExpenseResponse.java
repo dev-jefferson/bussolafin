@@ -5,5 +5,9 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record ExpenseResponse(
-        UUID id, CategoryResponse category, BigDecimal value, BigDecimal simulatedValue) {
+        UUID id,
+        String description,
+        CategoryResponse category,
+        BigDecimal value,
+        BigDecimal simulatedValue) {
 }

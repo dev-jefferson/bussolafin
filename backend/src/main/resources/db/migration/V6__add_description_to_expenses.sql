@@ -1,0 +1,2 @@
+ALTER TABLE expenses ADD COLUMN description VARCHAR(255) NOT NULL DEFAULT 'Despesa';
+ALTER TABLE expenses ALTER COLUMN description DROP DEFAULT;

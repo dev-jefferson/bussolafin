@@ -34,7 +34,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
   const [creating, setCreating] = useState(false);
 
   function handleDelete(expense: Expense) {
-    if (!confirm(`Excluir a despesa de "${expense.category.name}"?`)) return;
+    if (!confirm(`Excluir a despesa "${expense.description}"?`)) return;
     deleteExpense.mutate(expense.id, {
       onSuccess: () => toast.success("Despesa excluída"),
       onError: (error) => {
@@ -72,6 +72,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Nome</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead className="text-right">Valor</TableHead>
               <TableHead className="text-right">Ajustado</TableHead>
@@ -81,8 +82,9 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
           <TableBody>
             {expenses.map((expense) => (
               <TableRow key={expense.id}>
-                <TableCell className="font-medium">
-                  <span className="flex items-center gap-2">
+                <TableCell className="font-medium">{expense.description}</TableCell>
+                <TableCell>
+                  <span className="flex items-center gap-2 text-muted-foreground">
                     {expense.category.name}
                     {expense.category.adjustable && <Badge variant="secondary">Ajustável</Badge>}
                   </span>
@@ -105,6 +107,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
           <TableFooter>
             <TableRow>
               <TableCell>Total</TableCell>
+              <TableCell />
               <TableCell className="text-right">{formatCurrency(total)}</TableCell>
               <TableCell />
               <TableCell />

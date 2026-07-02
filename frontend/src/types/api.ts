@@ -26,6 +26,7 @@ export type Income = {
 
 export type Expense = {
   id: string;
+  description: string;
   category: Category;
   value: number;
   simulatedValue: number | null;

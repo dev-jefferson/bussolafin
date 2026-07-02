@@ -44,7 +44,7 @@ class BudgetControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"categoryId":"%s","value":2000.00,"simulatedValue":800.00}
+                                {"description":"Supermercado","categoryId":"%s","value":2000.00,"simulatedValue":800.00}
                                 """.formatted(comidaCategoryId)))
                 .andExpect(status().isCreated());
 
@@ -52,7 +52,7 @@ class BudgetControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"categoryId":"%s","value":100.00}
+                                {"description":"Conta de agua","categoryId":"%s","value":100.00}
                                 """.formatted(aguaCategoryId)))
                 .andExpect(status().isCreated());
 

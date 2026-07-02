@@ -40,6 +40,7 @@ public class ExpenseService {
         Expense expense = Expense.builder()
                 .budget(budgetRepository.getReferenceById(budgetId))
                 .category(category)
+                .description(request.description())
                 .value(request.value())
                 .simulatedValue(request.simulatedValue())
                 .build();
@@ -51,6 +52,7 @@ public class ExpenseService {
         Expense expense = findOwned(userId, budgetId, expenseId);
         ExpenseCategory category = findOwnedCategory(userId, request.categoryId());
         expense.setCategory(category);
+        expense.setDescription(request.description());
         expense.setValue(request.value());
         expense.setSimulatedValue(request.simulatedValue());
         return expenseMapper.toResponse(expense);
