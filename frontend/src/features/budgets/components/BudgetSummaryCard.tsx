@@ -10,12 +10,10 @@ import { useBudgetSummary } from "../hooks";
 function StatCard({
   label,
   value,
-  secondaryValue,
   highlight,
 }: {
   label: string;
   value: number;
-  secondaryValue?: number;
   highlight?: boolean;
 }) {
   return (
@@ -25,11 +23,6 @@ function StatCard({
       </CardHeader>
       <CardContent>
         <p className="text-2xl font-semibold">{formatCurrency(value)}</p>
-        {secondaryValue != null && (
-          <p className="mt-1 text-sm text-muted-foreground">
-            simulado: {formatCurrency(secondaryValue)}
-          </p>
-        )}
       </CardContent>
     </Card>
   );
@@ -43,6 +36,9 @@ export function BudgetSummaryCard({ budgetId }: { budgetId: string }) {
     return <p className="text-sm text-muted-foreground">Carregando resumo...</p>;
   }
 
+  // "Gastos ajustados" já inclui os fixos reais + os ajustáveis simulados — por isso
+  // Economia = Renda - Gastos ajustados sempre bate, sem conta escondida.
+  const gastosAjustados = simulated ? summary.totalExpensesSimulated : summary.totalExpenses;
   const economia = simulated ? summary.economiaSimulada : summary.economia;
 
   return (
@@ -56,16 +52,8 @@ export function BudgetSummaryCard({ budgetId }: { budgetId: string }) {
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Renda total" value={summary.totalIncome} />
-        <StatCard
-          label="Gastos"
-          value={summary.totalExpenses}
-          secondaryValue={simulated ? summary.totalExpensesSimulated : undefined}
-        />
-        <StatCard
-          label="Ajustes (gastos ajustáveis)"
-          value={summary.totalAdjustable}
-          secondaryValue={simulated ? summary.totalAdjustableSimulated : undefined}
-        />
+        <StatCard label="Gastos" value={summary.totalExpenses} />
+        <StatCard label="Gastos ajustados" value={gastosAjustados} highlight={simulated} />
         <StatCard
           label={simulated ? "Economia (simulada)" : "Economia"}
           value={economia}
