@@ -57,7 +57,13 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
     });
   }
 
-  const total = expenses?.reduce((sum, expense) => sum + expense.value, 0) ?? 0;
+  const sortedExpenses = expenses ? [...expenses].sort((a, b) => b.value - a.value) : [];
+  const total = sortedExpenses.reduce((sum, expense) => sum + expense.value, 0);
+  const totalAjustado = sortedExpenses.reduce(
+    (sum, expense) =>
+      sum + (expense.category.adjustable ? expense.simulatedValue ?? expense.value : expense.value),
+    0
+  );
 
   return (
     <div className="grid gap-3">
@@ -92,7 +98,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {expenses.map((expense) => (
+            {sortedExpenses.map((expense) => (
               <TableRow key={expense.id}>
                 <TableCell className="font-medium">
                   <span className="flex items-center gap-1.5">
@@ -135,7 +141,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
               <TableCell>Total</TableCell>
               <TableCell />
               <TableCell className="text-right">{formatCurrency(total)}</TableCell>
-              <TableCell />
+              <TableCell className="text-right">{formatCurrency(totalAjustado)}</TableCell>
               <TableCell />
             </TableRow>
           </TableFooter>
