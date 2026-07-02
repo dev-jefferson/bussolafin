@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: controle-financeiro-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/controle_financeiro
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  threads:
+    virtual:
+      enabled: false
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:dev-only-secret-change-me-dev-only-secret-change-me}
+  expiration-ms: ${JWT_EXPIRATION_MS:7200000}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.controlefinanceiro.api: DEBUG
