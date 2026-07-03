@@ -8,6 +8,7 @@ public record RecurringExpenseResponse(
         UUID id,
         String description,
         CategoryResponse category,
+        Integer day,
         BigDecimal value,
         BigDecimal simulatedValue,
         boolean active) {

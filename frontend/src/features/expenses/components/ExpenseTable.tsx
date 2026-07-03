@@ -92,6 +92,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
             <TableRow>
               <TableHead>Nome</TableHead>
               <TableHead>Categoria</TableHead>
+              <TableHead>Dia</TableHead>
               <TableHead className="text-right">Valor</TableHead>
               <TableHead className="text-right">Ajustado</TableHead>
               <TableHead className="w-32" />
@@ -109,6 +110,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
                   </span>
                 </TableCell>
                 <TableCell className="text-muted-foreground">{expense.category.name}</TableCell>
+                <TableCell className="text-muted-foreground">{expense.day ?? "-"}</TableCell>
                 <TableCell className="text-right">{formatCurrency(expense.value)}</TableCell>
                 <TableCell className="text-right text-muted-foreground">
                   {expense.category.adjustable && expense.simulatedValue != null
@@ -139,6 +141,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
           <TableFooter>
             <TableRow>
               <TableCell>Total</TableCell>
+              <TableCell />
               <TableCell />
               <TableCell className="text-right">{formatCurrency(total)}</TableCell>
               <TableCell className="text-right">{formatCurrency(totalAjustado)}</TableCell>

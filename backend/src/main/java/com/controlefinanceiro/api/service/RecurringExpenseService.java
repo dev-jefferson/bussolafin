@@ -38,6 +38,7 @@ public class RecurringExpenseService {
                 .user(userRepository.getReferenceById(userId))
                 .category(category)
                 .description(request.description())
+                .day(request.day())
                 .value(request.value())
                 .simulatedValue(request.simulatedValue())
                 .active(Boolean.TRUE.equals(request.active()))
@@ -51,6 +52,7 @@ public class RecurringExpenseService {
         ExpenseCategory category = findOwnedCategory(userId, request.categoryId());
         recurringExpense.setCategory(category);
         recurringExpense.setDescription(request.description());
+        recurringExpense.setDay(request.day());
         recurringExpense.setValue(request.value());
         recurringExpense.setSimulatedValue(request.simulatedValue());
         recurringExpense.setActive(Boolean.TRUE.equals(request.active()));

@@ -30,6 +30,7 @@ export type Expense = {
   id: string;
   description: string;
   category: Category;
+  day: number | null;
   value: number;
   simulatedValue: number | null;
   recurring: boolean;
@@ -39,6 +40,7 @@ export type RecurringExpense = {
   id: string;
   description: string;
   category: Category;
+  day: number | null;
   value: number;
   simulatedValue: number | null;
   active: boolean;

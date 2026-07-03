@@ -38,6 +38,7 @@ export function RecurringExpenseList() {
         input: {
           description: item.description,
           categoryId: item.category.id,
+          day: item.day,
           value: item.value,
           simulatedValue: item.simulatedValue,
           active,
@@ -80,6 +81,7 @@ export function RecurringExpenseList() {
           <TableRow>
             <TableHead>Nome</TableHead>
             <TableHead>Categoria</TableHead>
+            <TableHead>Dia</TableHead>
             <TableHead className="text-right">Valor</TableHead>
             <TableHead>Ativo</TableHead>
             <TableHead className="w-24" />
@@ -90,6 +92,7 @@ export function RecurringExpenseList() {
             <TableRow key={item.id}>
               <TableCell className="font-medium">{item.description}</TableCell>
               <TableCell className="text-muted-foreground">{item.category.name}</TableCell>
+              <TableCell className="text-muted-foreground">{item.day ?? "-"}</TableCell>
               <TableCell className="text-right">{formatCurrency(item.value)}</TableCell>
               <TableCell>
                 <Switch

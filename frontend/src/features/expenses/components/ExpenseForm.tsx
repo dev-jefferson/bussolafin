@@ -46,6 +46,7 @@ export function ExpenseForm({
     defaultValues: {
       description: expense?.description ?? "",
       categoryId: expense?.category.id ?? "",
+      day: expense?.day ?? null,
       value: expense?.value ?? 0,
       simulatedValue: expense?.simulatedValue ?? null,
     },
@@ -127,7 +128,28 @@ export function ExpenseForm({
             </FormItem>
           )}
         />
-        <div className={isAdjustable ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 gap-4"}>
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="day"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dia (opcional)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={31}
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="value"
@@ -147,30 +169,30 @@ export function ExpenseForm({
               </FormItem>
             )}
           />
-          {isAdjustable && (
-            <FormField
-              control={form.control}
-              name="simulatedValue"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Valor ajustado (opcional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min={0}
-                      value={field.value ?? ""}
-                      onChange={(e) =>
-                        field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
         </div>
+        {isAdjustable && (
+          <FormField
+            control={form.control}
+            name="simulatedValue"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Valor ajustado (opcional)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min={0}
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <Button type="submit" disabled={isPending}>
           {isEditing ? "Salvar alterações" : "Adicionar despesa"}
         </Button>

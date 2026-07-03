@@ -116,6 +116,39 @@ class RecurringControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
+    @Test
+    void expenseDayFlowsThroughCreatePromoteAndGeneration() throws Exception {
+        String token = registerAndGetToken("expense-day@example.com");
+        String categoryId = createCategory(token, "Contas", false);
+        String julyBudgetId = createBudget(token, 7, 2026);
+
+        MvcResult expenseResult = mockMvc.perform(post("/api/v1/budgets/" + julyBudgetId + "/expenses")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"description":"Luz","categoryId":"%s","day":10,"value":150.00}
+                                """.formatted(categoryId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.day").value(10))
+                .andReturn();
+        String expenseId = objectMapper.readTree(expenseResult.getResponse().getContentAsString())
+                .get("id").asText();
+
+        mockMvc.perform(post("/api/v1/budgets/" + julyBudgetId + "/expenses/" + expenseId + "/promote-to-recurring")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.day").value(10));
+
+        String augustBudgetId = createBudget(token, 8, 2026);
+        mockMvc.perform(post("/api/v1/budgets/" + augustBudgetId + "/generate-recurring")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/budgets/" + augustBudgetId + "/expenses")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(jsonPath("$[0].day").value(10));
+    }
+
     private String createCategory(String token, String name, boolean adjustable) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/categories")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)

@@ -49,6 +49,7 @@ public class ExpenseService {
                 .budget(budgetRepository.getReferenceById(budgetId))
                 .category(category)
                 .description(request.description())
+                .day(request.day())
                 .value(request.value())
                 .simulatedValue(request.simulatedValue())
                 .build();
@@ -61,6 +62,7 @@ public class ExpenseService {
         ExpenseCategory category = findOwnedCategory(userId, request.categoryId());
         expense.setCategory(category);
         expense.setDescription(request.description());
+        expense.setDay(request.day());
         expense.setValue(request.value());
         expense.setSimulatedValue(request.simulatedValue());
         return expenseMapper.toResponse(expense);
@@ -78,6 +80,7 @@ public class ExpenseService {
                 .user(userRepository.getReferenceById(userId))
                 .category(expense.getCategory())
                 .description(expense.getDescription())
+                .day(expense.getDay())
                 .value(expense.getValue())
                 .simulatedValue(expense.getSimulatedValue())
                 .active(true)

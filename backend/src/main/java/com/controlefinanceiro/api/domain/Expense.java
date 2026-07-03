@@ -33,6 +33,9 @@ public class Expense extends BaseEntity {
     @Column(nullable = false)
     private String description;
 
+    @Column
+    private Integer day;
+
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal value;
 

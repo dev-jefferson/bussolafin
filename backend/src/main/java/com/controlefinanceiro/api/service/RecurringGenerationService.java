@@ -61,6 +61,7 @@ public class RecurringGenerationService {
                     .budget(budgetRef)
                     .category(template.getCategory())
                     .description(template.getDescription())
+                    .day(template.getDay())
                     .value(template.getValue())
                     .simulatedValue(template.getSimulatedValue())
                     .recurringExpense(template)

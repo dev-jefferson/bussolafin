@@ -45,6 +45,7 @@ export function RecurringExpenseForm({
     defaultValues: {
       description: recurringExpense?.description ?? "",
       categoryId: recurringExpense?.category.id ?? "",
+      day: recurringExpense?.day ?? null,
       value: recurringExpense?.value ?? 0,
       simulatedValue: recurringExpense?.simulatedValue ?? null,
       active: recurringExpense?.active ?? true,
@@ -116,6 +117,27 @@ export function RecurringExpenseForm({
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
+            name="day"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dia (opcional)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={31}
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="value"
             render={({ field }) => (
               <FormItem>
@@ -133,28 +155,28 @@ export function RecurringExpenseForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="simulatedValue"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Valor ajustado (opcional)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min={0}
-                    value={field.value ?? ""}
-                    onChange={(e) =>
-                      field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
+        <FormField
+          control={form.control}
+          name="simulatedValue"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Valor ajustado (opcional)</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min={0}
+                  value={field.value ?? ""}
+                  onChange={(e) =>
+                    field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
+                  }
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="active"
