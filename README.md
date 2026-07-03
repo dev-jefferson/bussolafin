@@ -2,6 +2,8 @@
 
 Sistema de controle financeiro mensal (receitas, despesas por categoria e simulação de "gasto ajustado"), substituindo uma planilha Excel.
 
+🔗 **Aplicação publicada**: [bussolafin.vercel.app](https://bussolafin.vercel.app/login)
+
 ## Stack
 
 - **Backend**: Java 21, Spring Boot 3.5, Spring Security (JWT), Spring Data JPA, PostgreSQL, Flyway, MapStruct, Lombok, springdoc-openapi, Testcontainers.
