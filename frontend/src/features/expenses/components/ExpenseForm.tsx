@@ -139,7 +139,7 @@ export function ExpenseForm({
                     type="number"
                     step="0.01"
                     min={0}
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={(e) => field.onChange(e.target.valueAsNumber)}
                   />
                 </FormControl>

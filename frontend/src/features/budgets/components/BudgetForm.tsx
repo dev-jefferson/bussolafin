@@ -73,7 +73,7 @@ export function BudgetForm({
                     type="number"
                     min={1}
                     max={12}
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={(e) => field.onChange(e.target.valueAsNumber)}
                   />
                 </FormControl>
@@ -90,7 +90,7 @@ export function BudgetForm({
                 <FormControl>
                   <Input
                     type="number"
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={(e) => field.onChange(e.target.valueAsNumber)}
                   />
                 </FormControl>
@@ -110,7 +110,7 @@ export function BudgetForm({
                   type="number"
                   step="0.01"
                   min={0}
-                  value={field.value}
+                  value={field.value || ""}
                   onChange={(e) => field.onChange(e.target.valueAsNumber)}
                 />
               </FormControl>
