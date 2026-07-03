@@ -22,10 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * Ajustes 13.760/8.560, Economia 2.525/7.725.
  */
 @ExtendWith(MockitoExtension.class)
-class SummaryServiceTest {
-
-    @Mock
-    private BudgetService budgetService;
+class BudgetSummaryCalculatorTest {
 
     @Mock
     private IncomeRepository incomeRepository;
@@ -34,22 +31,19 @@ class SummaryServiceTest {
     private ExpenseRepository expenseRepository;
 
     @InjectMocks
-    private SummaryService summaryService;
+    private BudgetSummaryCalculator budgetSummaryCalculator;
 
     @Test
     void computesTotalsMatchingTheOriginalSpreadsheet() {
-        UUID userId = UUID.randomUUID();
-        UUID budgetId = UUID.randomUUID();
-
         Budget budget = Budget.builder()
+                .id(UUID.randomUUID())
                 .month(7)
                 .year(2026)
                 .previousBalance(new BigDecimal("900.00"))
                 .build();
 
-        when(budgetService.findOwned(userId, budgetId)).thenReturn(budget);
-        when(incomeRepository.sumValueByBudgetId(budgetId)).thenReturn(new BigDecimal("19240.00"));
-        when(expenseRepository.getTotalsByBudgetId(budgetId)).thenReturn(new ExpenseTotalsProjection() {
+        when(incomeRepository.sumValueByBudgetId(budget.getId())).thenReturn(new BigDecimal("19240.00"));
+        when(expenseRepository.getTotalsByBudgetId(budget.getId())).thenReturn(new ExpenseTotalsProjection() {
             @Override
             public BigDecimal getTotalExpenses() {
                 return new BigDecimal("17615.00");
@@ -71,7 +65,7 @@ class SummaryServiceTest {
             }
         });
 
-        BudgetSummaryResponse summary = summaryService.getSummary(userId, budgetId);
+        BudgetSummaryResponse summary = budgetSummaryCalculator.compute(budget);
 
         assertThat(summary.totalIncome()).isEqualByComparingTo("20140.00");
         assertThat(summary.totalExpenses()).isEqualByComparingTo("17615.00");
@@ -84,18 +78,15 @@ class SummaryServiceTest {
 
     @Test
     void computesZeroEconomiaWhenExpensesEqualIncome() {
-        UUID userId = UUID.randomUUID();
-        UUID budgetId = UUID.randomUUID();
-
         Budget budget = Budget.builder()
+                .id(UUID.randomUUID())
                 .month(1)
                 .year(2026)
                 .previousBalance(BigDecimal.ZERO)
                 .build();
 
-        when(budgetService.findOwned(userId, budgetId)).thenReturn(budget);
-        when(incomeRepository.sumValueByBudgetId(budgetId)).thenReturn(new BigDecimal("1000.00"));
-        when(expenseRepository.getTotalsByBudgetId(budgetId)).thenReturn(new ExpenseTotalsProjection() {
+        when(incomeRepository.sumValueByBudgetId(budget.getId())).thenReturn(new BigDecimal("1000.00"));
+        when(expenseRepository.getTotalsByBudgetId(budget.getId())).thenReturn(new ExpenseTotalsProjection() {
             @Override
             public BigDecimal getTotalExpenses() {
                 return new BigDecimal("1000.00");
@@ -117,7 +108,7 @@ class SummaryServiceTest {
             }
         });
 
-        BudgetSummaryResponse summary = summaryService.getSummary(userId, budgetId);
+        BudgetSummaryResponse summary = budgetSummaryCalculator.compute(budget);
 
         assertThat(summary.economia()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(summary.economiaSimulada()).isEqualByComparingTo(BigDecimal.ZERO);

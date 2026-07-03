@@ -78,4 +78,9 @@ public class BudgetController {
     public ResponseEntity<GenerateRecurringResponse> generateRecurring(@PathVariable UUID id) {
         return ResponseEntity.ok(recurringGenerationService.generate(currentUserProvider.getUserId(), id));
     }
+
+    @PostMapping("/{id}/sync-previous-balance")
+    public ResponseEntity<BudgetResponse> syncPreviousBalance(@PathVariable UUID id) {
+        return ResponseEntity.ok(budgetService.syncPreviousBalance(currentUserProvider.getUserId(), id));
+    }
 }

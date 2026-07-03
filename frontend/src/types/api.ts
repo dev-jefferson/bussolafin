@@ -15,6 +15,7 @@ export type Budget = {
   month: number;
   year: number;
   previousBalance: number;
+  expectedPreviousBalance: number | null;
 };
 
 export type Income = {

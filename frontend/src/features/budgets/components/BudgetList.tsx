@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency, formatMonthYear } from "@/lib/format";
 import { ApiRequestError } from "@/lib/api-client";
 import { useBudgets, useDeleteBudget } from "../hooks";
+import { PreviousBalanceSyncNotice } from "./PreviousBalanceSyncNotice";
 
 export function BudgetList() {
   const { data: budgets, isPending } = useBudgets();
@@ -46,17 +47,16 @@ export function BudgetList() {
                 </Link>
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
-                Sobra anterior: {formatCurrency(budget.previousBalance)}
-              </p>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => handleDelete(budget.id, label)}
-              >
-                <Trash2 className="size-4" />
-              </Button>
+            <CardContent className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">
+                  Sobra anterior: {formatCurrency(budget.previousBalance)}
+                </p>
+                <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(budget.id, label)}>
+                  <Trash2 className="size-4" />
+                </Button>
+              </div>
+              <PreviousBalanceSyncNotice budget={budget} />
             </CardContent>
           </Card>
         );

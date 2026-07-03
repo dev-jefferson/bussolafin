@@ -29,3 +29,7 @@ export function updateBudget(id: string, input: BudgetInput) {
 export function deleteBudget(id: string) {
   return apiClient.delete<void>(`/budgets/${id}`);
 }
+
+export function syncPreviousBalance(id: string) {
+  return apiClient.post<Budget>(`/budgets/${id}/sync-previous-balance`);
+}

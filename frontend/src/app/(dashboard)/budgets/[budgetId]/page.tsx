@@ -10,6 +10,7 @@ import { CategoryBreakdownChart } from "@/features/expenses/components/CategoryB
 import { ExpenseTable } from "@/features/expenses/components/ExpenseTable";
 import { IncomeTable } from "@/features/incomes/components/IncomeTable";
 import { GenerateRecurringButton } from "@/features/recurring/components/GenerateRecurringButton";
+import { PreviousBalanceSyncNotice } from "@/features/budgets/components/PreviousBalanceSyncNotice";
 import { formatMonthYear } from "@/lib/format";
 
 export default function BudgetDetailPage({
@@ -32,6 +33,8 @@ export default function BudgetDetailPage({
         </div>
         <GenerateRecurringButton budgetId={budgetId} />
       </div>
+
+      {budget && <PreviousBalanceSyncNotice budget={budget} />}
 
       <Tabs defaultValue="summary">
         <TabsList>

@@ -55,6 +55,18 @@ export function useCreateNextBudget() {
   });
 }
 
+export function useSyncPreviousBalance() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: budgetsApi.syncPreviousBalance,
+    onSuccess: (budget) => {
+      queryClient.invalidateQueries({ queryKey: BUDGETS_KEY });
+      queryClient.invalidateQueries({ queryKey: budgetKey(budget.id) });
+      queryClient.invalidateQueries({ queryKey: summaryKey(budget.id) });
+    },
+  });
+}
+
 export function invalidateBudgetSummary(
   queryClient: ReturnType<typeof useQueryClient>,
   budgetId: string
