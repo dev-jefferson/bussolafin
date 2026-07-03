@@ -38,16 +38,15 @@ export function BudgetSummaryCard({
     return <p className="text-sm text-muted-foreground">Carregando resumo...</p>;
   }
 
-  // "Gastos ajustados" já inclui os fixos reais + os ajustáveis simulados — por isso
-  // Economia = Renda - Gastos ajustados sempre bate, sem conta escondida.
-  const gastosAjustados = simulated ? summary.totalExpensesSimulated : summary.totalExpenses;
+  // Gastos e Gastos ajustados são fixos (fatos do mês, com e sem as simulações
+  // aplicadas) - só Economia alterna, comparando as duas colunas conforme o toggle.
   const economia = simulated ? summary.economiaSimulada : summary.economia;
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard label="Renda total" value={summary.totalIncome} />
       <StatCard label="Gastos" value={summary.totalExpenses} />
-      <StatCard label="Gastos ajustados" value={gastosAjustados} highlight={simulated} />
+      <StatCard label="Gastos ajustados" value={summary.totalExpensesSimulated} />
       <StatCard
         label={simulated ? "Economia (simulada)" : "Economia"}
         value={economia}
