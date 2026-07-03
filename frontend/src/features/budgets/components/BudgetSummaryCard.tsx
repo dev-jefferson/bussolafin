@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { formatCurrency } from "@/lib/format";
 import { useBudgetSummary } from "../hooks";
 
@@ -28,9 +25,14 @@ function StatCard({
   );
 }
 
-export function BudgetSummaryCard({ budgetId }: { budgetId: string }) {
+export function BudgetSummaryCard({
+  budgetId,
+  simulated,
+}: {
+  budgetId: string;
+  simulated: boolean;
+}) {
   const { data: summary, isPending } = useBudgetSummary(budgetId);
-  const [simulated, setSimulated] = useState(false);
 
   if (isPending || !summary) {
     return <p className="text-sm text-muted-foreground">Carregando resumo...</p>;
@@ -42,24 +44,15 @@ export function BudgetSummaryCard({ budgetId }: { budgetId: string }) {
   const economia = simulated ? summary.economiaSimulada : summary.economia;
 
   return (
-    <div className="grid gap-4">
-      <div className="flex items-center gap-2">
-        <Switch id="simulate" checked={simulated} onCheckedChange={setSimulated} />
-        <Label htmlFor="simulate">Simular gasto ajustado</Label>
-        <span className="text-sm text-muted-foreground">
-          — e se eu fizesse os ajustes que estou considerando?
-        </span>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Renda total" value={summary.totalIncome} />
-        <StatCard label="Gastos" value={summary.totalExpenses} />
-        <StatCard label="Gastos ajustados" value={gastosAjustados} highlight={simulated} />
-        <StatCard
-          label={simulated ? "Economia (simulada)" : "Economia"}
-          value={economia}
-          highlight={simulated}
-        />
-      </div>
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <StatCard label="Renda total" value={summary.totalIncome} />
+      <StatCard label="Gastos" value={summary.totalExpenses} />
+      <StatCard label="Gastos ajustados" value={gastosAjustados} highlight={simulated} />
+      <StatCard
+        label={simulated ? "Economia (simulada)" : "Economia"}
+        value={economia}
+        highlight={simulated}
+      />
     </div>
   );
 }

@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { formatCurrency } from "@/lib/format";
 import { useExpensesByCategory } from "../hooks";
 
@@ -28,9 +25,14 @@ function ChartTooltip({
   );
 }
 
-export function CategoryBreakdownChart({ budgetId }: { budgetId: string }) {
+export function CategoryBreakdownChart({
+  budgetId,
+  simulated,
+}: {
+  budgetId: string;
+  simulated: boolean;
+}) {
   const { data: breakdown, isPending } = useExpensesByCategory(budgetId);
-  const [simulated, setSimulated] = useState(false);
 
   if (isPending) {
     return <p className="text-sm text-muted-foreground">Carregando gastos por categoria...</p>;
@@ -52,23 +54,15 @@ export function CategoryBreakdownChart({ budgetId }: { budgetId: string }) {
 
   return (
     <div className="grid gap-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block size-2.5 rounded-full" style={{ backgroundColor: ADJUSTABLE_COLOR }} />
-            Ajustável
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-block size-2.5 rounded-full" style={{ backgroundColor: FIXED_COLOR }} />
-            Fixo
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Switch id="breakdown-simulate" checked={simulated} onCheckedChange={setSimulated} />
-          <Label htmlFor="breakdown-simulate" className="text-xs">
-            Simular gasto ajustado
-          </Label>
-        </div>
+      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block size-2.5 rounded-full" style={{ backgroundColor: ADJUSTABLE_COLOR }} />
+          Ajustável
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block size-2.5 rounded-full" style={{ backgroundColor: FIXED_COLOR }} />
+          Fixo
+        </span>
       </div>
       <ResponsiveContainer width="100%" height={Math.max(data.length * rowHeight, 120)}>
         <BarChart data={data} layout="vertical" margin={{ left: 8, right: 24 }}>

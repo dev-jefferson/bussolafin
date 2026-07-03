@@ -1,6 +1,8 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BudgetSummaryCard } from "@/features/budgets/components/BudgetSummaryCard";
 import { useBudget } from "@/features/budgets/hooks";
@@ -17,6 +19,7 @@ export default function BudgetDetailPage({
 }) {
   const { budgetId } = use(params);
   const { data: budget } = useBudget(budgetId);
+  const [simulated, setSimulated] = useState(false);
 
   return (
     <div className="grid gap-6">
@@ -37,10 +40,17 @@ export default function BudgetDetailPage({
           <TabsTrigger value="expenses">Despesas</TabsTrigger>
         </TabsList>
         <TabsContent value="summary" className="grid gap-6 pt-4">
-          <BudgetSummaryCard budgetId={budgetId} />
+          <div className="flex items-center gap-2">
+            <Switch id="simulate" checked={simulated} onCheckedChange={setSimulated} />
+            <Label htmlFor="simulate">Simular gasto ajustado</Label>
+            <span className="text-sm text-muted-foreground">
+              — e se eu fizesse os ajustes que estou considerando?
+            </span>
+          </div>
+          <BudgetSummaryCard budgetId={budgetId} simulated={simulated} />
           <div>
             <h2 className="mb-3 text-sm font-medium text-muted-foreground">Gastos por categoria</h2>
-            <CategoryBreakdownChart budgetId={budgetId} />
+            <CategoryBreakdownChart budgetId={budgetId} simulated={simulated} />
           </div>
         </TabsContent>
         <TabsContent value="incomes" className="pt-4">
