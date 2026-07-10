@@ -26,6 +26,9 @@ public record RecurringExpenseRequest(
         @DecimalMin(value = "0.0", message = "Valor simulado não pode ser negativo")
         BigDecimal simulatedValue,
 
+        @NotNull(message = "Informe se a despesa é ajustável")
+        Boolean adjustable,
+
         @NotNull(message = "Informe se o recorrente está ativo")
         Boolean active) {
 }

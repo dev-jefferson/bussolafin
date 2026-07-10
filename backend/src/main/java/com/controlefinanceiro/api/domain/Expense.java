@@ -42,6 +42,9 @@ public class Expense extends BaseEntity {
     @Column(name = "simulated_value", precision = 12, scale = 2)
     private BigDecimal simulatedValue;
 
+    @Column(nullable = false)
+    private boolean adjustable;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recurring_expense_id")
     private RecurringExpense recurringExpense;

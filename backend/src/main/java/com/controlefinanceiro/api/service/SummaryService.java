@@ -33,7 +33,6 @@ public class SummaryService {
     }
 
     private CategoryBreakdownItem toItem(CategoryBreakdownProjection p) {
-        return new CategoryBreakdownItem(
-                p.getCategoryId(), p.getCategoryName(), p.getAdjustable(), p.getTotal(), p.getTotalSimulated());
+        return new CategoryBreakdownItem(p.getCategoryId(), p.getCategoryName(), p.getTotal(), p.getTotalSimulated());
     }
 }

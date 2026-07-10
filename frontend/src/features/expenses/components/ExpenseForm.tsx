@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useCategories } from "@/features/categories/hooks";
 import { ApiRequestError } from "@/lib/api-client";
 import type { Expense } from "@/types/api";
@@ -49,12 +50,11 @@ export function ExpenseForm({
       day: expense?.day ?? null,
       value: expense?.value ?? 0,
       simulatedValue: expense?.simulatedValue ?? null,
+      adjustable: expense?.adjustable ?? false,
     },
   });
 
-  const selectedCategoryId = form.watch("categoryId");
-  const selectedCategory = categories?.find((category) => category.id === selectedCategoryId);
-  const isAdjustable = selectedCategory?.adjustable ?? false;
+  const isAdjustable = form.watch("adjustable");
 
   function onSubmit(values: ExpenseInput) {
     const payload = isAdjustable ? values : { ...values, simulatedValue: null };
@@ -97,16 +97,7 @@ export function ExpenseForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Categoria</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  const category = categories?.find((c) => c.id === value);
-                  if (!category?.adjustable) {
-                    form.setValue("simulatedValue", null);
-                  }
-                }}
-                value={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione uma categoria">
@@ -119,7 +110,7 @@ export function ExpenseForm({
                 <SelectContent>
                   {categories?.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {category.name} {category.adjustable ? "(ajustável)" : ""}
+                      {category.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -170,6 +161,23 @@ export function ExpenseForm({
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="adjustable"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+              <div>
+                <FormLabel>Ajustável</FormLabel>
+                <p className="text-sm text-muted-foreground">
+                  Gasto que dá para cortar ou reduzir
+                </p>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
         {isAdjustable && (
           <FormField
             control={form.control}

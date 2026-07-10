@@ -2,5 +2,5 @@ package com.controlefinanceiro.api.dto.category;
 
 import java.util.UUID;
 
-public record CategoryResponse(UUID id, String name, boolean adjustable) {
+public record CategoryResponse(UUID id, String name) {
 }

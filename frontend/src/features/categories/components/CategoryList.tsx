@@ -3,7 +3,6 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -55,7 +54,6 @@ export function CategoryList() {
         <TableHeader>
           <TableRow>
             <TableHead>Nome</TableHead>
-            <TableHead>Tipo</TableHead>
             <TableHead className="w-24" />
           </TableRow>
         </TableHeader>
@@ -63,13 +61,6 @@ export function CategoryList() {
           {categories.map((category) => (
             <TableRow key={category.id}>
               <TableCell className="font-medium">{category.name}</TableCell>
-              <TableCell>
-                {category.adjustable ? (
-                  <Badge variant="secondary">Ajustável</Badge>
-                ) : (
-                  <Badge variant="outline">Fixo</Badge>
-                )}
-              </TableCell>
               <TableCell className="flex justify-end gap-1">
                 <Button variant="ghost" size="icon-sm" onClick={() => setEditing(category)}>
                   <Pencil className="size-4" />

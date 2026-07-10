@@ -34,13 +34,15 @@ public class RecurringExpenseService {
     @Transactional
     public RecurringExpenseResponse create(UUID userId, RecurringExpenseRequest request) {
         ExpenseCategory category = findOwnedCategory(userId, request.categoryId());
+        boolean adjustable = Boolean.TRUE.equals(request.adjustable());
         RecurringExpense recurringExpense = RecurringExpense.builder()
                 .user(userRepository.getReferenceById(userId))
                 .category(category)
                 .description(request.description())
                 .day(request.day())
                 .value(request.value())
-                .simulatedValue(request.simulatedValue())
+                .simulatedValue(adjustable ? request.simulatedValue() : null)
+                .adjustable(adjustable)
                 .active(Boolean.TRUE.equals(request.active()))
                 .build();
         return recurringExpenseMapper.toResponse(recurringExpenseRepository.save(recurringExpense));
@@ -50,11 +52,13 @@ public class RecurringExpenseService {
     public RecurringExpenseResponse update(UUID userId, UUID id, RecurringExpenseRequest request) {
         RecurringExpense recurringExpense = findOwned(userId, id);
         ExpenseCategory category = findOwnedCategory(userId, request.categoryId());
+        boolean adjustable = Boolean.TRUE.equals(request.adjustable());
         recurringExpense.setCategory(category);
         recurringExpense.setDescription(request.description());
         recurringExpense.setDay(request.day());
         recurringExpense.setValue(request.value());
-        recurringExpense.setSimulatedValue(request.simulatedValue());
+        recurringExpense.setSimulatedValue(adjustable ? request.simulatedValue() : null);
+        recurringExpense.setAdjustable(adjustable);
         recurringExpense.setActive(Boolean.TRUE.equals(request.active()));
         return recurringExpenseMapper.toResponse(recurringExpense);
     }

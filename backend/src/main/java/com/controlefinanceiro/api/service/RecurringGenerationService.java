@@ -64,6 +64,7 @@ public class RecurringGenerationService {
                     .day(template.getDay())
                     .value(template.getValue())
                     .simulatedValue(template.getSimulatedValue())
+                    .adjustable(template.isAdjustable())
                     .recurringExpense(template)
                     .build();
             expenseRepository.save(expense);

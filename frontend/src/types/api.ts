@@ -7,7 +7,6 @@ export type User = {
 export type Category = {
   id: string;
   name: string;
-  adjustable: boolean;
 };
 
 export type Budget = {
@@ -33,6 +32,7 @@ export type Expense = {
   day: number | null;
   value: number;
   simulatedValue: number | null;
+  adjustable: boolean;
   recurring: boolean;
 };
 
@@ -43,6 +43,7 @@ export type RecurringExpense = {
   day: number | null;
   value: number;
   simulatedValue: number | null;
+  adjustable: boolean;
   active: boolean;
 };
 
@@ -82,7 +83,6 @@ export type BudgetSummary = {
 export type CategoryBreakdownItem = {
   categoryId: string;
   categoryName: string;
-  adjustable: boolean;
   total: number;
   totalSimulated: number;
 };

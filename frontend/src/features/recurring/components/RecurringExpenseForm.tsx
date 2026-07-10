@@ -48,14 +48,18 @@ export function RecurringExpenseForm({
       day: recurringExpense?.day ?? null,
       value: recurringExpense?.value ?? 0,
       simulatedValue: recurringExpense?.simulatedValue ?? null,
+      adjustable: recurringExpense?.adjustable ?? false,
       active: recurringExpense?.active ?? true,
     },
   });
 
+  const isAdjustable = form.watch("adjustable");
+
   function onSubmit(values: RecurringExpenseInput) {
+    const payload = isAdjustable ? values : { ...values, simulatedValue: null };
     const mutation = isEditing
-      ? updateRecurringExpense.mutateAsync({ id: recurringExpense!.id, input: values })
-      : createRecurringExpense.mutateAsync(values);
+      ? updateRecurringExpense.mutateAsync({ id: recurringExpense!.id, input: payload })
+      : createRecurringExpense.mutateAsync(payload);
 
     mutation
       .then(() => {
@@ -158,25 +162,44 @@ export function RecurringExpenseForm({
         </div>
         <FormField
           control={form.control}
-          name="simulatedValue"
+          name="adjustable"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Valor ajustado (opcional)</FormLabel>
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+              <div>
+                <FormLabel>Ajustável</FormLabel>
+                <p className="text-sm text-muted-foreground">
+                  Gasto que dá para cortar ou reduzir
+                </p>
+              </div>
               <FormControl>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min={0}
-                  value={field.value ?? ""}
-                  onChange={(e) =>
-                    field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
-                  }
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
+        {isAdjustable && (
+          <FormField
+            control={form.control}
+            name="simulatedValue"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Valor ajustado (opcional)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min={0}
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(e.target.value === "" ? null : e.target.valueAsNumber)
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="active"

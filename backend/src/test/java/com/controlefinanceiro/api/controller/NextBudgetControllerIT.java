@@ -34,7 +34,7 @@ class NextBudgetControllerIT extends AbstractIntegrationTest {
     void createsNextBudgetCarryingForwardPreviousLeftoverAndRecurringItems() throws Exception {
         String token = registerAndGetToken("next-budget-carry@example.com");
 
-        String categoryId = createCategory(token, "Casa", false);
+        String categoryId = createCategory(token, "Casa");
         createRecurringExpense(token, "Aluguel", categoryId, "1000.00");
 
         MvcResult budgetResult = mockMvc.perform(post("/api/v1/budgets")
@@ -60,7 +60,7 @@ class NextBudgetControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"Mercado","categoryId":"%s","value":800.00}
+                                {"description":"Mercado","categoryId":"%s","value":800.00,"adjustable":false}
                                 """.formatted(categoryId)))
                 .andExpect(status().isCreated());
 
@@ -121,13 +121,13 @@ class NextBudgetControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.length()").value(1));
     }
 
-    private String createCategory(String token, String name, boolean adjustable) throws Exception {
+    private String createCategory(String token, String name) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/categories")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"%s","adjustable":%s}
-                                """.formatted(name, adjustable)))
+                                {"name":"%s"}
+                                """.formatted(name)))
                 .andExpect(status().isCreated())
                 .andReturn();
         return objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText();
@@ -139,7 +139,7 @@ class NextBudgetControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"%s","categoryId":"%s","value":%s,"active":true}
+                                {"description":"%s","categoryId":"%s","value":%s,"adjustable":false,"active":true}
                                 """.formatted(description, categoryId, value)))
                 .andExpect(status().isCreated());
     }

@@ -60,8 +60,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
   const sortedExpenses = expenses ? [...expenses].sort((a, b) => b.value - a.value) : [];
   const total = sortedExpenses.reduce((sum, expense) => sum + expense.value, 0);
   const totalAjustado = sortedExpenses.reduce(
-    (sum, expense) =>
-      sum + (expense.category.adjustable ? expense.simulatedValue ?? expense.value : expense.value),
+    (sum, expense) => sum + (expense.adjustable ? expense.simulatedValue ?? expense.value : expense.value),
     0
   );
 
@@ -113,7 +112,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
                 <TableCell className="text-muted-foreground">{expense.day ?? "-"}</TableCell>
                 <TableCell className="text-right">{formatCurrency(expense.value)}</TableCell>
                 <TableCell className="text-right text-muted-foreground">
-                  {expense.category.adjustable && expense.simulatedValue != null
+                  {expense.adjustable && expense.simulatedValue != null
                     ? formatCurrency(expense.simulatedValue)
                     : "-"}
                 </TableCell>

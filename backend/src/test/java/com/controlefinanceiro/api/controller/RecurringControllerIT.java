@@ -18,7 +18,7 @@ class RecurringControllerIT extends AbstractIntegrationTest {
     @Test
     void generateRecurringCreatesEntriesAndIsIdempotent() throws Exception {
         String token = registerAndGetToken("recurring-generate@example.com");
-        String categoryId = createCategory(token, "Mobilidade", true);
+        String categoryId = createCategory(token, "Mobilidade");
         createRecurringExpense(token, "Gasolina", categoryId, "250.00");
         createRecurringIncome(token, "Salário", "3000.00");
 
@@ -53,7 +53,7 @@ class RecurringControllerIT extends AbstractIntegrationTest {
     @Test
     void editingRecurringTemplateDoesNotAffectAlreadyGeneratedMonths() throws Exception {
         String token = registerAndGetToken("recurring-edit@example.com");
-        String categoryId = createCategory(token, "Casa", false);
+        String categoryId = createCategory(token, "Casa");
         String recurringExpenseId = createRecurringExpense(token, "Aluguel", categoryId, "1000.00");
 
         String julyBudgetId = createBudget(token, 7, 2026);
@@ -66,7 +66,7 @@ class RecurringControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"Aluguel","categoryId":"%s","value":1200.00,"active":true}
+                                {"description":"Aluguel","categoryId":"%s","value":1200.00,"adjustable":false,"active":true}
                                 """.formatted(categoryId)))
                 .andExpect(status().isOk());
 
@@ -87,14 +87,14 @@ class RecurringControllerIT extends AbstractIntegrationTest {
     @Test
     void promoteExpenseToRecurringCreatesTemplateAndMarksInstance() throws Exception {
         String token = registerAndGetToken("recurring-promote@example.com");
-        String categoryId = createCategory(token, "Saúde", true);
+        String categoryId = createCategory(token, "Saúde");
         String budgetId = createBudget(token, 7, 2026);
 
         MvcResult expenseResult = mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"Plano de saude","categoryId":"%s","value":450.00}
+                                {"description":"Plano de saude","categoryId":"%s","value":450.00,"adjustable":true}
                                 """.formatted(categoryId)))
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -119,14 +119,14 @@ class RecurringControllerIT extends AbstractIntegrationTest {
     @Test
     void expenseDayFlowsThroughCreatePromoteAndGeneration() throws Exception {
         String token = registerAndGetToken("expense-day@example.com");
-        String categoryId = createCategory(token, "Contas", false);
+        String categoryId = createCategory(token, "Contas");
         String julyBudgetId = createBudget(token, 7, 2026);
 
         MvcResult expenseResult = mockMvc.perform(post("/api/v1/budgets/" + julyBudgetId + "/expenses")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"Luz","categoryId":"%s","day":10,"value":150.00}
+                                {"description":"Luz","categoryId":"%s","day":10,"value":150.00,"adjustable":false}
                                 """.formatted(categoryId)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.day").value(10))
@@ -149,13 +149,13 @@ class RecurringControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[0].day").value(10));
     }
 
-    private String createCategory(String token, String name, boolean adjustable) throws Exception {
+    private String createCategory(String token, String name) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/categories")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"%s","adjustable":%s}
-                                """.formatted(name, adjustable)))
+                                {"name":"%s"}
+                                """.formatted(name)))
                 .andExpect(status().isCreated())
                 .andReturn();
         return objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText();
@@ -179,7 +179,7 @@ class RecurringControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"%s","categoryId":"%s","value":%s,"active":true}
+                                {"description":"%s","categoryId":"%s","value":%s,"adjustable":false,"active":true}
                                 """.formatted(description, categoryId, value)))
                 .andExpect(status().isCreated())
                 .andReturn();

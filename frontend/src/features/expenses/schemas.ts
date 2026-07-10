@@ -12,6 +12,7 @@ export const expenseSchema = z.object({
     .optional(),
   value: z.number().positive("Valor deve ser maior que zero"),
   simulatedValue: z.number().min(0, "Valor simulado não pode ser negativo").nullable().optional(),
+  adjustable: z.boolean(),
 });
 
 export type ExpenseInput = z.infer<typeof expenseSchema>;

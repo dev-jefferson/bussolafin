@@ -43,5 +43,8 @@ public class RecurringExpense extends BaseEntity {
     private BigDecimal simulatedValue;
 
     @Column(nullable = false)
+    private boolean adjustable;
+
+    @Column(nullable = false)
     private boolean active;
 }

@@ -27,7 +27,4 @@ public class ExpenseCategory extends BaseEntity {
 
     @Column(nullable = false)
     private String name;
-
-    @Column(nullable = false)
-    private boolean adjustable;
 }

@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import { ApiRequestError } from "@/lib/api-client";
 import type { Category } from "@/types/api";
 import { useCreateCategory, useUpdateCategory } from "../hooks";
@@ -35,7 +34,6 @@ export function CategoryForm({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: category?.name ?? "",
-      adjustable: category?.adjustable ?? false,
     },
   });
 
@@ -70,23 +68,6 @@ export function CategoryForm({
                 <Input placeholder="Ex: COMIDA" {...field} />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="adjustable"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-              <div>
-                <FormLabel>Ajustável</FormLabel>
-                <p className="text-sm text-muted-foreground">
-                  Gasto que dá para cortar ou reduzir
-                </p>
-              </div>
-              <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
             </FormItem>
           )}
         />

@@ -24,5 +24,8 @@ public record ExpenseRequest(
         BigDecimal value,
 
         @DecimalMin(value = "0.0", message = "Valor simulado não pode ser negativo")
-        BigDecimal simulatedValue) {
+        BigDecimal simulatedValue,
+
+        @NotNull(message = "Informe se a despesa é ajustável")
+        Boolean adjustable) {
 }

@@ -37,7 +37,6 @@ public class CategoryService {
         ExpenseCategory category = ExpenseCategory.builder()
                 .user(userRepository.getReferenceById(userId))
                 .name(request.name())
-                .adjustable(Boolean.TRUE.equals(request.adjustable()))
                 .build();
         return categoryMapper.toResponse(categoryRepository.save(category));
     }
@@ -46,7 +45,6 @@ public class CategoryService {
     public CategoryResponse update(UUID userId, UUID categoryId, CategoryRequest request) {
         ExpenseCategory category = findOwned(userId, categoryId);
         category.setName(request.name());
-        category.setAdjustable(Boolean.TRUE.equals(request.adjustable()));
         return categoryMapper.toResponse(category);
     }
 

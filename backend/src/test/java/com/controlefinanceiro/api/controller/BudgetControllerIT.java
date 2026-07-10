@@ -18,8 +18,8 @@ class BudgetControllerIT extends AbstractIntegrationTest {
     void fullFlowCreatesBudgetWithIncomesAndExpensesAndComputesSummary() throws Exception {
         String token = registerAndGetToken("owner@example.com");
 
-        String comidaCategoryId = createCategory(token, "COMIDA", true);
-        String aguaCategoryId = createCategory(token, "AGUA", false);
+        String comidaCategoryId = createCategory(token, "COMIDA");
+        String aguaCategoryId = createCategory(token, "AGUA");
 
         MvcResult budgetResult = mockMvc.perform(post("/api/v1/budgets")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -44,7 +44,7 @@ class BudgetControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"Supermercado","categoryId":"%s","value":2000.00,"simulatedValue":800.00}
+                                {"description":"Supermercado","categoryId":"%s","value":2000.00,"simulatedValue":800.00,"adjustable":true}
                                 """.formatted(comidaCategoryId)))
                 .andExpect(status().isCreated());
 
@@ -52,7 +52,7 @@ class BudgetControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"Conta de agua","categoryId":"%s","value":100.00}
+                                {"description":"Conta de agua","categoryId":"%s","value":100.00,"adjustable":false}
                                 """.formatted(aguaCategoryId)))
                 .andExpect(status().isCreated());
 
@@ -122,8 +122,8 @@ class BudgetControllerIT extends AbstractIntegrationTest {
     void simulatedValueOnFixedCategoryExpenseIsIgnoredInTotals() throws Exception {
         String token = registerAndGetToken("fixed-sim@example.com");
 
-        String aguaCategoryId = createCategory(token, "AGUA", false);
-        String comidaCategoryId = createCategory(token, "COMIDA", true);
+        String aguaCategoryId = createCategory(token, "AGUA");
+        String comidaCategoryId = createCategory(token, "COMIDA");
 
         MvcResult budgetResult = mockMvc.perform(post("/api/v1/budgets")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -136,13 +136,13 @@ class BudgetControllerIT extends AbstractIntegrationTest {
         String budgetId = objectMapper.readTree(budgetResult.getResponse().getContentAsString())
                 .get("id").asText();
 
-        // Fixed category: even with a simulatedValue set (by mistake or via the API directly),
+        // Not adjustable: even with a simulatedValue set (by mistake or via the API directly),
         // it must NOT count toward the simulated totals.
         mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"Conta de agua","categoryId":"%s","value":100.00,"simulatedValue":50.00}
+                                {"description":"Conta de agua","categoryId":"%s","value":100.00,"simulatedValue":50.00,"adjustable":false}
                                 """.formatted(aguaCategoryId)))
                 .andExpect(status().isCreated());
 
@@ -150,7 +150,7 @@ class BudgetControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"description":"Supermercado","categoryId":"%s","value":200.00,"simulatedValue":80.00}
+                                {"description":"Supermercado","categoryId":"%s","value":200.00,"simulatedValue":80.00,"adjustable":true}
                                 """.formatted(comidaCategoryId)))
                 .andExpect(status().isCreated());
 
@@ -168,13 +168,13 @@ class BudgetControllerIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[?(@.categoryName == 'COMIDA')].totalSimulated").value(80.00));
     }
 
-    private String createCategory(String token, String name, boolean adjustable) throws Exception {
+    private String createCategory(String token, String name) throws Exception {
         MvcResult result = mockMvc.perform(post("/api/v1/categories")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"name":"%s","adjustable":%s}
-                                """.formatted(name, adjustable)))
+                                {"name":"%s"}
+                                """.formatted(name)))
                 .andExpect(status().isCreated())
                 .andReturn();
         return objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asText();

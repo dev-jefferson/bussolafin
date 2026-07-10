@@ -45,13 +45,15 @@ public class ExpenseService {
     public ExpenseResponse create(UUID userId, UUID budgetId, ExpenseRequest request) {
         budgetService.findOwned(userId, budgetId);
         ExpenseCategory category = findOwnedCategory(userId, request.categoryId());
+        boolean adjustable = Boolean.TRUE.equals(request.adjustable());
         Expense expense = Expense.builder()
                 .budget(budgetRepository.getReferenceById(budgetId))
                 .category(category)
                 .description(request.description())
                 .day(request.day())
                 .value(request.value())
-                .simulatedValue(request.simulatedValue())
+                .simulatedValue(adjustable ? request.simulatedValue() : null)
+                .adjustable(adjustable)
                 .build();
         return expenseMapper.toResponse(expenseRepository.save(expense));
     }
@@ -60,11 +62,13 @@ public class ExpenseService {
     public ExpenseResponse update(UUID userId, UUID budgetId, UUID expenseId, ExpenseRequest request) {
         Expense expense = findOwned(userId, budgetId, expenseId);
         ExpenseCategory category = findOwnedCategory(userId, request.categoryId());
+        boolean adjustable = Boolean.TRUE.equals(request.adjustable());
         expense.setCategory(category);
         expense.setDescription(request.description());
         expense.setDay(request.day());
         expense.setValue(request.value());
-        expense.setSimulatedValue(request.simulatedValue());
+        expense.setSimulatedValue(adjustable ? request.simulatedValue() : null);
+        expense.setAdjustable(adjustable);
         return expenseMapper.toResponse(expense);
     }
 
@@ -83,6 +87,7 @@ public class ExpenseService {
                 .day(expense.getDay())
                 .value(expense.getValue())
                 .simulatedValue(expense.getSimulatedValue())
+                .adjustable(expense.isAdjustable())
                 .active(true)
                 .build();
         recurringExpenseRepository.save(recurringExpense);

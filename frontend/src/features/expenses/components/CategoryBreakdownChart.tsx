@@ -1,25 +1,23 @@
 "use client";
 
-import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatCurrency } from "@/lib/format";
 import { useExpensesByCategory } from "../hooks";
 
-const ADJUSTABLE_COLOR = "var(--chart-1)";
-const FIXED_COLOR = "var(--chart-muted)";
+const BAR_COLOR = "var(--chart-1)";
 
 function ChartTooltip({
   active,
   payload,
 }: {
   active?: boolean;
-  payload?: { payload: { categoryName: string; adjustable: boolean; value: number } }[];
+  payload?: { payload: { categoryName: string; value: number } }[];
 }) {
   if (!active || !payload?.length) return null;
   const item = payload[0].payload;
   return (
     <div className="rounded-md border bg-popover p-2 text-xs text-popover-foreground shadow-sm">
       <p className="font-medium">{item.categoryName}</p>
-      <p className="text-muted-foreground">{item.adjustable ? "Ajustável" : "Fixo"}</p>
       <p className="mt-1 font-medium">{formatCurrency(item.value)}</p>
     </div>
   );
@@ -45,7 +43,6 @@ export function CategoryBreakdownChart({
   const data = breakdown
     .map((item) => ({
       categoryName: item.categoryName,
-      adjustable: item.adjustable,
       value: simulated ? item.totalSimulated : item.total,
     }))
     .sort((a, b) => b.value - a.value);
@@ -54,16 +51,6 @@ export function CategoryBreakdownChart({
 
   return (
     <div className="grid gap-3">
-      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block size-2.5 rounded-full" style={{ backgroundColor: ADJUSTABLE_COLOR }} />
-          Ajustável
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block size-2.5 rounded-full" style={{ backgroundColor: FIXED_COLOR }} />
-          Fixo
-        </span>
-      </div>
       <ResponsiveContainer width="100%" height={Math.max(data.length * rowHeight, 120)}>
         <BarChart data={data} layout="vertical" margin={{ left: 8, right: 24 }}>
           <XAxis
@@ -84,14 +71,7 @@ export function CategoryBreakdownChart({
             axisLine={false}
           />
           <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--muted)" }} />
-          <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={24}>
-            {data.map((entry) => (
-              <Cell
-                key={entry.categoryName}
-                fill={entry.adjustable ? ADJUSTABLE_COLOR : FIXED_COLOR}
-              />
-            ))}
-          </Bar>
+          <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={24} fill={BAR_COLOR} />
         </BarChart>
       </ResponsiveContainer>
     </div>

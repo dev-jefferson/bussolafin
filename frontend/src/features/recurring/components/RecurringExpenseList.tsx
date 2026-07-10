@@ -41,6 +41,7 @@ export function RecurringExpenseList() {
           day: item.day,
           value: item.value,
           simulatedValue: item.simulatedValue,
+          adjustable: item.adjustable,
           active,
         },
       },

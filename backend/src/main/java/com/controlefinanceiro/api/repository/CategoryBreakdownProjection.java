@@ -9,8 +9,6 @@ public interface CategoryBreakdownProjection {
 
     String getCategoryName();
 
-    boolean getAdjustable();
-
     BigDecimal getTotal();
 
     BigDecimal getTotalSimulated();
