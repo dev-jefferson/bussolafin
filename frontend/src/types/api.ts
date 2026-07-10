@@ -33,6 +33,7 @@ export type Expense = {
   value: number;
   simulatedValue: number | null;
   adjustable: boolean;
+  paid: boolean;
   recurring: boolean;
 };
 

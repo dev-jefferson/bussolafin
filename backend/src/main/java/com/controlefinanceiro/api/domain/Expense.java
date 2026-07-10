@@ -45,6 +45,9 @@ public class Expense extends BaseEntity {
     @Column(nullable = false)
     private boolean adjustable;
 
+    @Column(nullable = false)
+    private boolean paid;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recurring_expense_id")
     private RecurringExpense recurringExpense;

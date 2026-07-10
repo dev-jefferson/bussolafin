@@ -1,5 +1,6 @@
 package com.controlefinanceiro.api.controller;
 
+import com.controlefinanceiro.api.dto.expense.ExpensePaidRequest;
 import com.controlefinanceiro.api.dto.expense.ExpenseRequest;
 import com.controlefinanceiro.api.dto.expense.ExpenseResponse;
 import com.controlefinanceiro.api.dto.recurring.RecurringExpenseResponse;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,6 +49,12 @@ public class ExpenseController {
     public ResponseEntity<ExpenseResponse> update(
             @PathVariable UUID budgetId, @PathVariable UUID id, @Valid @RequestBody ExpenseRequest request) {
         return ResponseEntity.ok(expenseService.update(currentUserProvider.getUserId(), budgetId, id, request));
+    }
+
+    @PatchMapping("/{id}/paid")
+    public ResponseEntity<ExpenseResponse> setPaid(
+            @PathVariable UUID budgetId, @PathVariable UUID id, @Valid @RequestBody ExpensePaidRequest request) {
+        return ResponseEntity.ok(expenseService.setPaid(currentUserProvider.getUserId(), budgetId, id, request));
     }
 
     @DeleteMapping("/{id}")

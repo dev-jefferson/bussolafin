@@ -12,5 +12,6 @@ public record ExpenseResponse(
         BigDecimal value,
         BigDecimal simulatedValue,
         boolean adjustable,
+        boolean paid,
         boolean recurring) {
 }

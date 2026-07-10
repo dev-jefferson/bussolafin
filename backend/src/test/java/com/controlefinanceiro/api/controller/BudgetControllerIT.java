@@ -2,6 +2,7 @@ package com.controlefinanceiro.api.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -166,6 +167,53 @@ class BudgetControllerIT extends AbstractIntegrationTest {
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(jsonPath("$[?(@.categoryName == 'AGUA')].totalSimulated").value(100.00))
                 .andExpect(jsonPath("$[?(@.categoryName == 'COMIDA')].totalSimulated").value(80.00));
+    }
+
+    @Test
+    void marksExpenseAsPaidAndBack() throws Exception {
+        String token = registerAndGetToken("expense-paid@example.com");
+        String categoryId = createCategory(token, "Contas");
+
+        MvcResult budgetResult = mockMvc.perform(post("/api/v1/budgets")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"month":11,"year":2026,"previousBalance":0}
+                                """))
+                .andExpect(status().isCreated())
+                .andReturn();
+        String budgetId = objectMapper.readTree(budgetResult.getResponse().getContentAsString())
+                .get("id").asText();
+
+        MvcResult expenseResult = mockMvc.perform(post("/api/v1/budgets/" + budgetId + "/expenses")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"description":"Luz","categoryId":"%s","value":150.00,"adjustable":false}
+                                """.formatted(categoryId)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.paid").value(false))
+                .andReturn();
+        String expenseId = objectMapper.readTree(expenseResult.getResponse().getContentAsString())
+                .get("id").asText();
+
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/expenses/" + expenseId + "/paid")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"paid":true}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paid").value(true));
+
+        mockMvc.perform(patch("/api/v1/budgets/" + budgetId + "/expenses/" + expenseId + "/paid")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"paid":false}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.paid").value(false));
     }
 
     private String createCategory(String token, String name) throws Exception {

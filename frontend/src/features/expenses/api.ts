@@ -18,6 +18,10 @@ export function updateExpense(budgetId: string, id: string, input: ExpenseInput)
   return apiClient.put<Expense>(`/budgets/${budgetId}/expenses/${id}`, input);
 }
 
+export function setExpensePaid(budgetId: string, id: string, paid: boolean) {
+  return apiClient.patch<Expense>(`/budgets/${budgetId}/expenses/${id}/paid`, { paid });
+}
+
 export function deleteExpense(budgetId: string, id: string) {
   return apiClient.delete<void>(`/budgets/${budgetId}/expenses/${id}`);
 }

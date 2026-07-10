@@ -3,6 +3,7 @@ package com.controlefinanceiro.api.service;
 import com.controlefinanceiro.api.domain.Expense;
 import com.controlefinanceiro.api.domain.ExpenseCategory;
 import com.controlefinanceiro.api.domain.RecurringExpense;
+import com.controlefinanceiro.api.dto.expense.ExpensePaidRequest;
 import com.controlefinanceiro.api.dto.expense.ExpenseRequest;
 import com.controlefinanceiro.api.dto.expense.ExpenseResponse;
 import com.controlefinanceiro.api.dto.recurring.RecurringExpenseResponse;
@@ -69,6 +70,13 @@ public class ExpenseService {
         expense.setValue(request.value());
         expense.setSimulatedValue(adjustable ? request.simulatedValue() : null);
         expense.setAdjustable(adjustable);
+        return expenseMapper.toResponse(expense);
+    }
+
+    @Transactional
+    public ExpenseResponse setPaid(UUID userId, UUID budgetId, UUID expenseId, ExpensePaidRequest request) {
+        Expense expense = findOwned(userId, budgetId, expenseId);
+        expense.setPaid(Boolean.TRUE.equals(request.paid()));
         return expenseMapper.toResponse(expense);
     }
 

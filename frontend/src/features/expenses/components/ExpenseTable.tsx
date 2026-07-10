@@ -3,6 +3,7 @@
 import { Pencil, Plus, Repeat, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,18 +22,58 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ApiRequestError } from "@/lib/api-client";
+import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/format";
+import { useBudget } from "@/features/budgets/hooks";
 import { usePromoteExpenseToRecurring } from "@/features/recurring/hooks";
-import type { Expense } from "@/types/api";
-import { useDeleteExpense, useExpenses } from "../hooks";
+import type { Budget, Expense } from "@/types/api";
+import { useDeleteExpense, useExpenses, useSetExpensePaid } from "../hooks";
 import { ExpenseForm } from "./ExpenseForm";
+
+type ExpenseStatus = "paid" | "pending" | "overdue";
+
+const STATUS_STYLES: Record<ExpenseStatus, string> = {
+  paid: "bg-emerald-100 text-emerald-800 hover:bg-emerald-200",
+  pending: "bg-amber-100 text-amber-800 hover:bg-amber-200",
+  overdue: "bg-red-100 text-red-800 hover:bg-red-200",
+};
+
+const STATUS_LABELS: Record<ExpenseStatus, string> = {
+  paid: "Pago",
+  pending: "Pendente",
+  overdue: "Não pago",
+};
+
+function getExpenseStatus(expense: Expense, budget?: Budget): ExpenseStatus {
+  if (expense.paid) return "paid";
+  if (!budget || expense.day == null) return "pending";
+  const dueDate = new Date(budget.year, budget.month - 1, expense.day);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return dueDate < today ? "overdue" : "pending";
+}
 
 export function ExpenseTable({ budgetId }: { budgetId: string }) {
   const { data: expenses, isPending } = useExpenses(budgetId);
+  const { data: budget } = useBudget(budgetId);
   const deleteExpense = useDeleteExpense(budgetId);
+  const setExpensePaid = useSetExpensePaid(budgetId);
   const promoteToRecurring = usePromoteExpenseToRecurring(budgetId);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [creating, setCreating] = useState(false);
+
+  function handleTogglePaid(expense: Expense) {
+    setExpensePaid.mutate(
+      { id: expense.id, paid: !expense.paid },
+      {
+        onError: (error) => {
+          const message =
+            error instanceof ApiRequestError ? error.message : "Não foi possível atualizar";
+          toast.error(message);
+        },
+      }
+    );
+  }
 
   function handleDelete(expense: Expense) {
     if (!confirm(`Excluir a despesa "${expense.description}"?`)) return;
@@ -94,6 +135,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
               <TableHead>Dia</TableHead>
               <TableHead className="text-right">Valor</TableHead>
               <TableHead className="text-right">Ajustado</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead className="w-32" />
             </TableRow>
           </TableHeader>
@@ -115,6 +157,20 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
                   {expense.adjustable && expense.simulatedValue != null
                     ? formatCurrency(expense.simulatedValue)
                     : "-"}
+                </TableCell>
+                <TableCell>
+                  {(() => {
+                    const status = getExpenseStatus(expense, budget);
+                    return (
+                      <Badge
+                        className={cn("cursor-pointer border-0", STATUS_STYLES[status])}
+                        onClick={() => handleTogglePaid(expense)}
+                        title="Clique para marcar como pago/não pago"
+                      >
+                        {STATUS_LABELS[status]}
+                      </Badge>
+                    );
+                  })()}
                 </TableCell>
                 <TableCell className="flex justify-end gap-1">
                   {!expense.recurring && (
@@ -144,6 +200,7 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
               <TableCell />
               <TableCell className="text-right">{formatCurrency(total)}</TableCell>
               <TableCell className="text-right">{formatCurrency(totalAjustado)}</TableCell>
+              <TableCell />
               <TableCell />
             </TableRow>
           </TableFooter>

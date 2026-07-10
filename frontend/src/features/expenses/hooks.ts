@@ -43,6 +43,15 @@ export function useUpdateExpense(budgetId: string) {
   });
 }
 
+export function useSetExpensePaid(budgetId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, paid }: { id: string; paid: boolean }) =>
+      expensesApi.setExpensePaid(budgetId, id, paid),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: expensesKey(budgetId) }),
+  });
+}
+
 export function useDeleteExpense(budgetId: string) {
   const invalidate = useInvalidateExpenses(budgetId);
   return useMutation({
