@@ -1,7 +1,7 @@
 "use client";
 
-import { Pencil, Plus, Repeat, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, ChevronRight, Pencil, Plus, Repeat, Trash2 } from "lucide-react";
+import { Fragment, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -26,32 +26,11 @@ import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/format";
 import { useBudget } from "@/features/budgets/hooks";
 import { usePromoteExpenseToRecurring } from "@/features/recurring/hooks";
-import type { Budget, Expense } from "@/types/api";
+import type { Expense } from "@/types/api";
 import { useDeleteExpense, useExpenses, useSetExpensePaid } from "../hooks";
+import { getItemStatus, STATUS_LABELS, STATUS_STYLES } from "../status";
+import { ExpenseEntryList } from "./ExpenseEntryList";
 import { ExpenseForm } from "./ExpenseForm";
-
-type ExpenseStatus = "paid" | "pending" | "overdue";
-
-const STATUS_STYLES: Record<ExpenseStatus, string> = {
-  paid: "bg-emerald-100 text-emerald-800 hover:bg-emerald-200",
-  pending: "bg-amber-100 text-amber-800 hover:bg-amber-200",
-  overdue: "bg-red-100 text-red-800 hover:bg-red-200",
-};
-
-const STATUS_LABELS: Record<ExpenseStatus, string> = {
-  paid: "Pago",
-  pending: "Pendente",
-  overdue: "Não pago",
-};
-
-function getExpenseStatus(expense: Expense, budget?: Budget): ExpenseStatus {
-  if (expense.paid) return "paid";
-  if (!budget || expense.day == null) return "pending";
-  const dueDate = new Date(budget.year, budget.month - 1, expense.day);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return dueDate < today ? "overdue" : "pending";
-}
 
 export function ExpenseTable({ budgetId }: { budgetId: string }) {
   const { data: expenses, isPending } = useExpenses(budgetId);
@@ -61,6 +40,19 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
   const promoteToRecurring = usePromoteExpenseToRecurring(budgetId);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [creating, setCreating] = useState(false);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+  function toggleExpanded(expenseId: string) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(expenseId)) {
+        next.delete(expenseId);
+      } else {
+        next.add(expenseId);
+      }
+      return next;
+    });
+  }
 
   function handleTogglePaid(expense: Expense) {
     setExpensePaid.mutate(
@@ -161,28 +153,42 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedExpenses.map((expense) => (
-              <TableRow key={expense.id}>
-                <TableCell className="font-medium">
-                  <span className="flex items-center gap-1.5">
-                    {expense.description}
-                    {expense.recurring && (
-                      <Repeat className="size-3.5 text-muted-foreground" aria-label="Recorrente" />
-                    )}
-                  </span>
-                </TableCell>
-                <TableCell className="text-muted-foreground">{expense.category.name}</TableCell>
-                <TableCell className="text-muted-foreground">{expense.day ?? "-"}</TableCell>
-                <TableCell className="text-right">{formatCurrency(expense.value)}</TableCell>
-                <TableCell className="text-right text-muted-foreground">
-                  {expense.adjustable && expense.simulatedValue != null
-                    ? formatCurrency(expense.simulatedValue)
-                    : "-"}
-                </TableCell>
-                <TableCell>
-                  {(() => {
-                    const status = getExpenseStatus(expense, budget);
-                    return (
+            {sortedExpenses.map((expense) => {
+              const status = getItemStatus(expense, budget);
+              const isExpanded = expandedIds.has(expense.id);
+              return (
+                <Fragment key={expense.id}>
+                  <TableRow>
+                    <TableCell className="font-medium">
+                      <span className="flex items-center gap-1.5">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="-ml-2"
+                          onClick={() => toggleExpanded(expense.id)}
+                          title="Ver lançamentos"
+                        >
+                          {isExpanded ? (
+                            <ChevronDown className="size-4" />
+                          ) : (
+                            <ChevronRight className="size-4" />
+                          )}
+                        </Button>
+                        {expense.description}
+                        {expense.recurring && (
+                          <Repeat className="size-3.5 text-muted-foreground" aria-label="Recorrente" />
+                        )}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{expense.category.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{expense.day ?? "-"}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(expense.value)}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {expense.adjustable && expense.simulatedValue != null
+                        ? formatCurrency(expense.simulatedValue)
+                        : "-"}
+                    </TableCell>
+                    <TableCell>
                       <Badge
                         className={cn("cursor-pointer border-0", STATUS_STYLES[status])}
                         onClick={() => handleTogglePaid(expense)}
@@ -190,29 +196,36 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
                       >
                         {STATUS_LABELS[status]}
                       </Badge>
-                    );
-                  })()}
-                </TableCell>
-                <TableCell className="flex justify-end gap-1">
-                  {!expense.recurring && (
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      title="Marcar como recorrente"
-                      onClick={() => handlePromote(expense)}
-                    >
-                      <Repeat className="size-4" />
-                    </Button>
+                    </TableCell>
+                    <TableCell className="flex justify-end gap-1">
+                      {!expense.recurring && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          title="Marcar como recorrente"
+                          onClick={() => handlePromote(expense)}
+                        >
+                          <Repeat className="size-4" />
+                        </Button>
+                      )}
+                      <Button variant="ghost" size="icon-sm" onClick={() => setEditing(expense)}>
+                        <Pencil className="size-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(expense)}>
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                  {isExpanded && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="bg-muted/30">
+                        <ExpenseEntryList budgetId={budgetId} expense={expense} budget={budget} />
+                      </TableCell>
+                    </TableRow>
                   )}
-                  <Button variant="ghost" size="icon-sm" onClick={() => setEditing(expense)}>
-                    <Pencil className="size-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon-sm" onClick={() => handleDelete(expense)}>
-                    <Trash2 className="size-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+                </Fragment>
+              );
+            })}
           </TableBody>
           <TableFooter>
             <TableRow>

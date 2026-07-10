@@ -75,4 +75,12 @@ public class ExpenseController {
                 expenseService.promoteToRecurring(currentUserProvider.getUserId(), budgetId, id);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/{id}/sync-value-from-entries")
+    public ResponseEntity<ExpenseResponse> syncValueFromEntries(
+            @PathVariable UUID budgetId, @PathVariable UUID id) {
+        ExpenseResponse response =
+                expenseService.syncValueFromEntries(currentUserProvider.getUserId(), budgetId, id);
+        return ResponseEntity.ok(response);
+    }
 }

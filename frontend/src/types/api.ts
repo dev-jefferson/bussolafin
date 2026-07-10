@@ -37,6 +37,14 @@ export type Expense = {
   recurring: boolean;
 };
 
+export type ExpenseEntry = {
+  id: string;
+  description: string | null;
+  day: number | null;
+  value: number;
+  paid: boolean;
+};
+
 export type RecurringExpense = {
   id: string;
   description: string;

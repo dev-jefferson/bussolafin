@@ -12,6 +12,7 @@ import com.controlefinanceiro.api.mapper.ExpenseMapper;
 import com.controlefinanceiro.api.mapper.RecurringExpenseMapper;
 import com.controlefinanceiro.api.repository.BudgetRepository;
 import com.controlefinanceiro.api.repository.ExpenseCategoryRepository;
+import com.controlefinanceiro.api.repository.ExpenseEntryRepository;
 import com.controlefinanceiro.api.repository.ExpenseRepository;
 import com.controlefinanceiro.api.repository.RecurringExpenseRepository;
 import com.controlefinanceiro.api.repository.UserRepository;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
+    private final ExpenseEntryRepository expenseEntryRepository;
     private final BudgetRepository budgetRepository;
     private final ExpenseCategoryRepository categoryRepository;
     private final RecurringExpenseRepository recurringExpenseRepository;
@@ -80,6 +82,17 @@ public class ExpenseService {
         return expenseMapper.toResponse(expense);
     }
 
+    /**
+     * Overwrites this expense's value with the sum of its lançamentos, so the user can keep
+     * adding dated entries throughout the month and then catch the total up with one click.
+     */
+    @Transactional
+    public ExpenseResponse syncValueFromEntries(UUID userId, UUID budgetId, UUID expenseId) {
+        Expense expense = findOwned(userId, budgetId, expenseId);
+        expense.setValue(expenseEntryRepository.sumValueByExpenseId(expenseId));
+        return expenseMapper.toResponse(expense);
+    }
+
     @Transactional
     public void delete(UUID userId, UUID budgetId, UUID expenseId) {
         expenseRepository.delete(findOwned(userId, budgetId, expenseId));
@@ -103,7 +116,7 @@ public class ExpenseService {
         return recurringExpenseMapper.toResponse(recurringExpense);
     }
 
-    private Expense findOwned(UUID userId, UUID budgetId, UUID expenseId) {
+    Expense findOwned(UUID userId, UUID budgetId, UUID expenseId) {
         return expenseRepository.findByIdAndBudget_IdAndBudget_User_Id(expenseId, budgetId, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Despesa não encontrada"));
     }

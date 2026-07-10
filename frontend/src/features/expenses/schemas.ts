@@ -16,3 +16,17 @@ export const expenseSchema = z.object({
 });
 
 export type ExpenseInput = z.infer<typeof expenseSchema>;
+
+export const expenseEntrySchema = z.object({
+  description: z.string().nullable().optional(),
+  day: z
+    .number()
+    .int()
+    .min(1, "Dia deve estar entre 1 e 31")
+    .max(31, "Dia deve estar entre 1 e 31")
+    .nullable()
+    .optional(),
+  value: z.number().positive("Valor deve ser maior que zero"),
+});
+
+export type ExpenseEntryInput = z.infer<typeof expenseEntrySchema>;
