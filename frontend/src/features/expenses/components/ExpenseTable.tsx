@@ -104,6 +104,11 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
     (sum, expense) => sum + (expense.adjustable ? expense.simulatedValue ?? expense.value : expense.value),
     0
   );
+  const paidCount = sortedExpenses.filter((expense) => expense.paid).length;
+  const totalPaid = sortedExpenses
+    .filter((expense) => expense.paid)
+    .reduce((sum, expense) => sum + expense.value, 0);
+  const totalToPay = total - totalPaid;
 
   return (
     <div className="grid gap-3">
@@ -127,7 +132,23 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
       ) : !expenses || expenses.length === 0 ? (
         <p className="text-sm text-muted-foreground">Nenhuma despesa cadastrada ainda.</p>
       ) : (
-        <Table>
+        <>
+          <div className="rounded-md border p-3 text-sm">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="inline-block size-2.5 rounded-full bg-emerald-500" />
+                Pago: {formatCurrency(totalPaid)}
+              </span>
+              <span className="flex items-center gap-1.5 font-medium">
+                <span className="inline-block size-2.5 rounded-full bg-amber-500" />
+                A pagar: {formatCurrency(totalToPay)}
+              </span>
+            </div>
+            <p className="mt-1 text-muted-foreground">
+              Total do mês: {formatCurrency(total)} · {paidCount} de {sortedExpenses.length} despesas pagas
+            </p>
+          </div>
+          <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
@@ -204,7 +225,8 @@ export function ExpenseTable({ budgetId }: { budgetId: string }) {
               <TableCell />
             </TableRow>
           </TableFooter>
-        </Table>
+          </Table>
+        </>
       )}
 
       <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
