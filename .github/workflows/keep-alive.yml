@@ -10,4 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping backend health endpoint
-        run: curl -fsS --max-time 30 https://bussolafin-api.onrender.com/actuator/health
+        run: |
+          curl -fsS --retry 8 --retry-delay 10 --retry-all-errors --max-time 90 \
+            https://bussolafin-api.onrender.com/actuator/health
